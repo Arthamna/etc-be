@@ -1,0 +1,65 @@
+info:
+  name: Register Admin
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/auth/admin/register
+  body:
+    type: json
+    data: |-
+      {
+          "username": "admin123456",
+          "email": "admin12@library.test",
+          "password": "admin123456",
+          "secret_key": "sshtt-rahasia"  
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: http://localhost:8080/auth/admin/register
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+              "username": "admin123456",
+              "email": "admin12@library.test",
+              "password": "admin123456",
+              "secret_key": "sshtt-rahasia"  
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Thu, 09 Apr 2026 15:39:07 GMT
+        - name: content-length
+          value: "559"
+      body:
+        type: json
+        data: |-
+          {
+            "user": {
+              "user_id": "bceacd86-3c6b-4da1-968f-11b6e393bc53",
+              "username": "admin123456",
+              "email": "admin12@library.test",
+              "profile_picture": "",
+              "role": "admin",
+              "registration_date": "2026-04-09T22:39:07.213989343+07:00",
+              "created_at": "2026-04-09T22:39:07.213989343+07:00",
+              "updated_at": "2026-04-09T22:39:07.213989343+07:00"
+            },
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmNlYWNkODYtM2M2Yi00ZGExLTk2OGYtMTFiNmUzOTNiYzUzIiwicm9sZSI6ImFkbWluIiwiaXNzIjoicnBMaWJyYXJ5IiwiZXhwIjoxNzc1NzU2MzQ3LCJpYXQiOjE3NzU3NDkxNDd9.onp5djGtn61Jq21-lm5Il4nCmwwKqxXg4mF5qv40xVc"
+          }

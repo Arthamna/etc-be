@@ -1,0 +1,59 @@
+info:
+  name: Delete
+  type: http
+  seq: 1
+
+http:
+  method: DELETE
+  url: http://localhost:8080/admin/category/15d4d719-49c5-4b1c-bf7f-a9e2343c184b
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDY2N2JkZTAtODcwZS00ZjhjLTkzOGYtYzZmZGYwMDZjYmVhIiwicm9sZSI6InVzZXIiLCJpc3MiOiJycExpYnJhcnkiLCJleHAiOjE3NzU3NTg2MjIsImlhdCI6MTc3NTc1MTQyMn0.RuvviJ6Z7qFHqF57FNBH9BsbsXVoxv-4SKP9rOq9YuU
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: http://localhost:8080/admin/category/15d4d719-49c5-4b1c-bf7f-a9e2343c184b
+      method: DELETE
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Thu, 09 Apr 2026 16:23:48 GMT
+        - name: content-length
+          value: "26"
+      body:
+        type: json
+        data: |-
+          {
+            "message": "book deleted"
+          }
+  - name: Unauthorized
+    request:
+      url: http://localhost:8080/admin/category/15d4d719-49c5-4b1c-bf7f-a9e2343c184b
+      method: DELETE
+    response:
+      status: 403
+      statusText: Forbidden
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Thu, 09 Apr 2026 16:24:06 GMT
+        - name: content-length
+          value: "33"
+      body:
+        type: json
+        data: |-
+          {
+            "error": "Admin access required"
+          }

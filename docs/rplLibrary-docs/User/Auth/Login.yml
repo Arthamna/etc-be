@@ -1,0 +1,52 @@
+info:
+  name: Login
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/auth/login
+  body:
+    type: json
+    data: |-
+      {
+          "email": "user@new.test",
+          "password": "password124"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: "Success "
+    request:
+      url: http://localhost:8080/auth/login
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+              "email": "user@new.test",
+              "password": "password124"
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Thu, 09 Apr 2026 14:16:36 GMT
+        - name: content-length
+          value: "262"
+      body:
+        type: json
+        data: |-
+          {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDY2N2JkZTAtODcwZS00ZjhjLTkzOGYtYzZmZGYwMDZjYmVhIiwicm9sZSI6InVzZXIiLCJpc3MiOiJycExpYnJhcnkiLCJleHAiOjE3NzU3NTEzOTYsImlhdCI6MTc3NTc0NDE5Nn0.T7PK0Yzqq9sdQWApUJxL1FIA8NrQZyeLc0fAmBgrsd0",
+            "role": "user"
+          }

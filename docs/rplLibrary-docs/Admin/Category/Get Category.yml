@@ -1,0 +1,63 @@
+info:
+  name: Get Category
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: http://localhost:8080/admin/category/15d4d719-49c5-4b1c-bf7f-a9e2343c184b
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmNlYWNkODYtM2M2Yi00ZGExLTk2OGYtMTFiNmUzOTNiYzUzIiwicm9sZSI6ImFkbWluIiwiaXNzIjoicnBMaWJyYXJ5IiwiZXhwIjoxNzc1NzU2NDkwLCJpYXQiOjE3NzU3NDkyOTB9.duqlsEblEcmp69s1_fxnsdlO7xENbD8my0yLrSbnVlI
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: http://localhost:8080/admin/category/CAT-001
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Thu, 09 Apr 2026 15:47:13 GMT
+        - name: content-length
+          value: "173"
+      body:
+        type: json
+        data: |-
+          {
+            "category_id": "CAT-001",
+            "name": "Programming",
+            "description": "Buku tentang pemrograman dan teknologi",
+            "created_at": "0001-01-01T00:00:00Z",
+            "updated_at": "0001-01-01T00:00:00Z"
+          }
+  - name: Unathorized
+    request:
+      url: http://localhost:8080/admin/category/CAT-001
+      method: GET
+    response:
+      status: 403
+      statusText: Forbidden
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Thu, 09 Apr 2026 16:17:51 GMT
+        - name: content-length
+          value: "33"
+      body:
+        type: json
+        data: |-
+          {
+            "error": "Admin access required"
+          }

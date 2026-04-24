@@ -1,0 +1,111 @@
+info:
+  name: "Update "
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: http://localhost:8080/admin/category/15d4d719-49c5-4b1c-bf7f-a9e2343c184
+  body:
+    type: json
+    data: |-
+      {
+          "name": "Normal1",
+          "description": "normal category updated"
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDY2N2JkZTAtODcwZS00ZjhjLTkzOGYtYzZmZGYwMDZjYmVhIiwicm9sZSI6InVzZXIiLCJpc3MiOiJycExpYnJhcnkiLCJleHAiOjE3NzU3NTg2MjIsImlhdCI6MTc3NTc1MTQyMn0.RuvviJ6Z7qFHqF57FNBH9BsbsXVoxv-4SKP9rOq9YuU
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: http://localhost:8080/admin/category/15d4d719-49c5-4b1c-bf7f-a9e2343c184b
+      method: PUT
+      body:
+        type: json
+        data: |-
+          {
+              "name": "Normal1",
+              "description": "normal category updated"
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Thu, 09 Apr 2026 16:21:08 GMT
+        - name: content-length
+          value: "183"
+      body:
+        type: json
+        data: |-
+          {
+            "category_id": "15d4d719-49c5-4b1c-bf7f-a9e2343c184b",
+            "name": "Normal1",
+            "description": "normal category updated",
+            "created_at": "0001-01-01T00:00:00Z",
+            "updated_at": "0001-01-01T00:00:00Z"
+          }
+  - name: Not Found
+    request:
+      url: http://localhost:8080/admin/category/15d4d719-49c5-4b1c-bf7f-a9e2343c184
+      method: PUT
+      body:
+        type: json
+        data: |-
+          {
+              "name": "Normal1",
+              "description": "normal category updated"
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Thu, 09 Apr 2026 16:21:34 GMT
+        - name: content-length
+          value: "30"
+      body:
+        type: json
+        data: |-
+          {
+            "error": "category not found"
+          }
+  - name: Unathorized
+    request:
+      url: http://localhost:8080/admin/category/15d4d719-49c5-4b1c-bf7f-a9e2343c184
+      method: PUT
+      body:
+        type: json
+        data: |-
+          {
+              "name": "Normal1",
+              "description": "normal category updated"
+          }
+    response:
+      status: 403
+      statusText: Forbidden
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Thu, 09 Apr 2026 16:21:57 GMT
+        - name: content-length
+          value: "33"
+      body:
+        type: json
+        data: |-
+          {
+            "error": "Admin access required"
+          }

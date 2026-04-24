@@ -1,0 +1,59 @@
+info:
+  name: Get All Categories
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: http://localhost:8080/api/books/categories
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDY2N2JkZTAtODcwZS00ZjhjLTkzOGYtYzZmZGYwMDZjYmVhIiwicm9sZSI6InVzZXIiLCJpc3MiOiJycExpYnJhcnkiLCJleHAiOjE3NzU3OTUxMzgsImlhdCI6MTc3NTc4NzkzOH0.dkcwro7N_ctIW5fRMsWjgs4AjcSBg3cUeoghTqwwxS8
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: http://localhost:8080/api/books/categories
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Fri, 10 Apr 2026 02:30:27 GMT
+        - name: content-length
+          value: "502"
+      body:
+        type: json
+        data: |-
+          [
+            {
+              "category_id": "CAT-001",
+              "name": "Programming",
+              "description": "Buku tentang pemrograman dan teknologi",
+              "created_at": "0001-01-01T00:00:00Z",
+              "updated_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "category_id": "CAT-002",
+              "name": "Productivity",
+              "description": "Buku pengembangan diri dan produktivitas",
+              "created_at": "0001-01-01T00:00:00Z",
+              "updated_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "category_id": "CAT-003",
+              "name": "Fantasy",
+              "description": "Buku fiksi fantasi",
+              "created_at": "0001-01-01T00:00:00Z",
+              "updated_at": "0001-01-01T00:00:00Z"
+            }
+          ]

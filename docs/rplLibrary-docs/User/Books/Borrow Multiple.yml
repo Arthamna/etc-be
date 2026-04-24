@@ -1,0 +1,111 @@
+info:
+  name: Borrow Multiple
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: http://localhost:8080/api/books/borrows
+  body:
+    type: json
+    data: |-
+      {
+          "book_ids":  [
+          "BOK-007",
+          "BOK-010",
+          "BOK-012"
+        ]
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDY2N2JkZTAtODcwZS00ZjhjLTkzOGYtYzZmZGYwMDZjYmVhIiwicm9sZSI6InVzZXIiLCJpc3MiOiJycExpYnJhcnkiLCJleHAiOjE3NzU3OTUxMzgsImlhdCI6MTc3NTc4NzkzOH0.dkcwro7N_ctIW5fRMsWjgs4AjcSBg3cUeoghTqwwxS8
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: http://localhost:8080/api/books/borrows
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+              "book_ids":  [
+              "BOK-007",
+              "BOK-010",
+              "BOK-012"
+            ]
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Fri, 10 Apr 2026 04:12:57 GMT
+        - name: content-length
+          value: "522"
+      body:
+        type: json
+        data: |-
+          {
+            "borrowed": [
+              {
+                "book_id": "BOK-007",
+                "title": "The Alchemist",
+                "user_id": "d667bde0-870e-4f8c-938f-c6fdf006cbea",
+                "username": "user124",
+                "borrowed_at": "2026-04-10T11:12:57.077632591+07:00"
+              },
+              {
+                "book_id": "BOK-010",
+                "title": "The Da Vinci Code",
+                "user_id": "d667bde0-870e-4f8c-938f-c6fdf006cbea",
+                "username": "user124",
+                "borrowed_at": "2026-04-10T11:12:57.077632591+07:00"
+              },
+              {
+                "book_id": "BOK-012",
+                "title": "A Little Life",
+                "user_id": "d667bde0-870e-4f8c-938f-c6fdf006cbea",
+                "username": "user124",
+                "borrowed_at": "2026-04-10T11:12:57.077632591+07:00"
+              }
+            ]
+          }
+  - name: Error Borrowed
+    request:
+      url: http://localhost:8080/api/books/borrows
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+              "book_ids":  [
+              "BOK-007",
+              "BOK-010",
+              "BOK-012"
+            ]
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Fri, 10 Apr 2026 04:13:22 GMT
+        - name: content-length
+          value: "42"
+      body:
+        type: json
+        data: |-
+          {
+            "error": "book already borrowed: BOK-007"
+          }
