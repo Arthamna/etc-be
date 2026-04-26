@@ -32,14 +32,17 @@ func main() {
 	jwtService := services.NewJWTService()
 	// repositories
 	userRepo := repositories.NewUserRepository(db)
+	rekrutmenRepo := repositories.NewRekrutmenRepository(db)
 
 	// services
 	userService := services.NewUserService(userRepo, jwtService)
+	rekrutmenService := services.NewRekrutmenService(rekrutmenRepo)
 
 	// handlers
 	userController := handlers.NewUserHandler(userService)
+	rekrutmenController := handlers.NewRekrutmenHandler(rekrutmenService)
 
-	routes.SetupRoutes(r, userController)
+	routes.SetupRoutes(r, userController, rekrutmenController)
 
 	r.Run(":8080")
 }

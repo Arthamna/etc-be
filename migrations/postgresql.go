@@ -56,7 +56,8 @@ func AutoMigrateAll(db *gorm.DB) error {
 	// db.Migrator().DropTable(&models.Category{}, &models.User{} , &models.Article{}) 
 	
 	if err := db.AutoMigrate(
-        &models.User{}, 
+        &models.User{},
+        &models.Rekrutmen{},
     ); err != nil {
 		return err
 	}

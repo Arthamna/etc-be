@@ -7,9 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, userController handlers.UserHandler) {
-	
-	// auth
+func SetupRoutes(r *gin.Engine, userController handlers.UserHandler, rekrutmenController handlers.RekrutmenHandler) {
+
 	auth := r.Group("/auth")
 	{
 		auth.POST("/register", userController.Register)
@@ -17,17 +16,19 @@ func SetupRoutes(r *gin.Engine, userController handlers.UserHandler) {
 		auth.POST("/admin/register", userController.RegisterAdmin)
 	}
 
-	// user
 	api := r.Group("/api")
 	api.Use(middleware.AuthMiddleware())
 	{
 		api.PATCH("/user/profile", userController.UpdateUser)
-	}
 
-	// Admin 
-	admin := r.Group("/admin")
-	admin.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
-	{
-		// admin routes can be added here
+		rekrutmen := api.Group("/rekrutmen")
+		{
+			rekrutmen.POST("", rekrutmenController.Create)
+			rekrutmen.GET("", rekrutmenController.GetAll)
+			rekrutmen.GET("/me", rekrutmenController.GetMyRekrutmen)
+			rekrutmen.GET("/:id", rekrutmenController.GetByID)
+			rekrutmen.PUT("/:id", rekrutmenController.Update)
+			rekrutmen.DELETE("/:id", rekrutmenController.Delete)
+		}
 	}
 }
