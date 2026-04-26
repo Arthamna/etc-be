@@ -70,3 +70,10 @@ type AdminRegisterRequest struct {
 	Password      string `json:"password" binding:"required,min=6"`
 	SecretKey     string `json:"secret_key" binding:"required"`
 }
+
+type UpdateUserRequest struct {
+	Nama          string `json:"nama"`
+	Jurusan       string `json:"jurusan"`
+	ContactPerson string `json:"contact_person"`
+	Role          string `json:"role"` // "mahasiswa" atau "dosen"
+}

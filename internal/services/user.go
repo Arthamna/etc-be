@@ -20,6 +20,7 @@ type (
 		Register(ctx context.Context, req dtos.UserRegisterRequest) (dtos.UserRegisterResponse, error)
 		RegisterAdmin(ctx context.Context, req dtos.AdminRegisterRequest) (dtos.UserRegisterResponse, error)
 		Login(ctx context.Context, req dtos.UserLoginRequest) (dtos.UserLoginResponse, error)
+		UpdateUser(ctx context.Context, userID string, req dtos.UpdateUserRequest) (*dtos.UserResponse, error)
 	}
 
 	userService struct {
@@ -148,4 +149,36 @@ func (s *userService) RegisterAdmin(ctx context.Context, req dtos.AdminRegisterR
 		User:  *dtos.ToUserResponse(createdUser),
 		Token: token,
 	}, nil
+}
+
+func (s *userService) UpdateUser(ctx context.Context, userID string, req dtos.UpdateUserRequest) (*dtos.UserResponse, error) {
+	user, err := s.userRepo.FindByID(ctx, userID)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	if req.Nama != "" {
+		user.Nama = req.Nama
+	}
+	if req.Jurusan != "" {
+		user.Jurusan = req.Jurusan
+	}
+	if req.ContactPerson != "" {
+		user.ContactPerson = req.ContactPerson
+	}
+	if req.Role != "" {
+		if req.Role != "mahasiswa" && req.Role != "dosen" {
+			return nil, errors.New("role harus mahasiswa atau dosen")
+		}
+		user.Role = req.Role
+	}
+
+	user.UpdatedAt = time.Now()
+
+	updated, err := s.userRepo.Update(ctx, nil, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return dtos.ToUserResponse(updated), nil
 }

@@ -21,7 +21,7 @@ func SetupRoutes(r *gin.Engine, userController handlers.UserHandler) {
 	api := r.Group("/api")
 	api.Use(middleware.AuthMiddleware())
 	{
-		// other user routes can be added here
+		api.PATCH("/user/profile", userController.UpdateUser)
 	}
 
 	// Admin 

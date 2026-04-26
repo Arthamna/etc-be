@@ -13,6 +13,7 @@ type (
 		Register(c *gin.Context)
 		Login(c *gin.Context)
 		RegisterAdmin(c *gin.Context)
+		UpdateUser(c *gin.Context)
 	}
 
 	userHandler struct {
@@ -74,4 +75,22 @@ func (h *userHandler) RegisterAdmin(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, user)
+}
+
+func (h *userHandler) UpdateUser(c *gin.Context) {
+	userID := c.MustGet("user_id").(string)
+
+	var req dtos.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := h.userService.UpdateUser(c.Request.Context(), userID, req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }
