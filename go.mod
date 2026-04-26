@@ -1,4 +1,4 @@
-module arthamna/rplLibrary
+module etc-backend
 
 go 1.25.0
 

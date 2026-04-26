@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"arthamna/rplLibrary/internal/models"
+	"etc-backend/internal/models"
 	"context"
 	"errors"
 
@@ -10,7 +10,7 @@ import (
 
 type UserRepository interface {
 	Create(ctx context.Context, tx *gorm.DB, user *models.User) (*models.User, error)
-	FindByEmail(ctx context.Context, email string) (*models.User, error)
+	FindByNRP(ctx context.Context, nrp string) (*models.User, error)
 	FindAll(ctx context.Context) ([]models.User, error)
 	FindByID(ctx context.Context,  id string) (*models.User, error)
 	Update(ctx context.Context, tx *gorm.DB, user *models.User) (*models.User, error)
@@ -40,9 +40,9 @@ func (r *userRepository) Create(ctx context.Context, tx *gorm.DB, user *models.U
 	return user, nil
 }
 
-func (r *userRepository) FindByEmail(ctx context.Context, email string) (*models.User, error) {
+func (r *userRepository) FindByNRP(ctx context.Context, nrp string) (*models.User, error) {
 	var user models.User
-	result := r.db.WithContext(ctx).Where("email = ?", email).First(&user)
+	result := r.db.WithContext(ctx).Where("nrp = ?", nrp).First(&user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil

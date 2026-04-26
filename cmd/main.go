@@ -1,12 +1,11 @@
 package main
 
 import (
-	"arthamna/rplLibrary/internal/handlers"
-	"arthamna/rplLibrary/internal/repositories"
-	"arthamna/rplLibrary/internal/routes"
-	"arthamna/rplLibrary/internal/services"
-	"arthamna/rplLibrary/pkg/auth"
-	"arthamna/rplLibrary/pkg/database"
+	"etc-backend/internal/handlers"
+	"etc-backend/internal/repositories"
+	"etc-backend/internal/routes"
+	"etc-backend/internal/services"
+	database "etc-backend/migrations"
 	"log"
 	"os"
 
@@ -30,24 +29,17 @@ func main() {
 
 	//
 
-	jwtService := auth.NewJWTService()
+	jwtService := services.NewJWTService()
 	// repositories
 	userRepo := repositories.NewUserRepository(db)
-	bookRepo := repositories.NewBookRepository(db)
-	bookBorrowing := repositories.NewBookBorrowingRepository(db)
-	categoryRepo := repositories.NewCategoryRepository(db)
 
 	// services
 	userService := services.NewUserService(userRepo, jwtService)
-	bookService := services.NewBookService(bookRepo, categoryRepo, userRepo, bookBorrowing)
-	categoryService := services.NewCategoryService(categoryRepo)
 
 	// handlers
 	userController := handlers.NewUserHandler(userService)
-	bookController := handlers.NewBookHandler(bookService)
-	categoryController := handlers.NewCategoryHandler(categoryService)
 
-	routes.SetupRoutes(r, userController, bookController, categoryController)
+	routes.SetupRoutes(r, userController)
 
 	r.Run(":8080")
 }

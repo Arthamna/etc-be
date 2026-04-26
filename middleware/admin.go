@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"arthamna/rplLibrary/constants"
+	"etc-backend/constants"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
