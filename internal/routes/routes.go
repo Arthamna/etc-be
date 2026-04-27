@@ -12,71 +12,82 @@ func SetupRoutes(r *gin.Engine, userController handlers.UserHandler, bookControl
 	// auth
 	auth := r.Group("/auth")
 	{
-		auth.POST("/register", userController.Register)
-		auth.POST("/login", userController.Login)
-		auth.POST("/admin/register", userController.RegisterAdmin)
+		// register user sekaligus onboarding data awal user
+		auth.POST("/register", userHandler.Register)
+
+		// login user
+		auth.POST("/login", userHandler.Login)
+
+		// update data user yang sedang login
+		auth.PATCH("/me", middleware.AuthMiddleware(), userHandler.UpdateUser)
+
+		// tampilkan data user yang sedang login
+		auth.GET("/me", middleware.AuthMiddleware(), userHandler.GetMe)
+
+		// upload profile picture user yang sedang login
+		auth.POST("/picture", middleware.AuthMiddleware(), userHandler.UploadPicture)
+
+		// tampilkan bookmark milik user yang sedang login
+		auth.GET("/bookmarks", middleware.AuthMiddleware(), userHandler.GetBookmarks)
 	}
 
-	// user
 	api := r.Group("/api")
 	api.Use(middleware.AuthMiddleware())
 	{
-		api.POST("/profile", userController.UploadPicture)
-		
-		// kinda confused, but let's say user dan admin punya endpoint tersendiri untuk bisa mengakses categories 
-		// sehingga user dapat melihat category, lalu juga mencari dan filtering dengan lebih mudah
-		
-		books := api.Group("/books")
+		// rekrutmen
+		rekrutmen := api.Group("/rekrutmen")
 		{
-			// borrow book
-			books.POST("/borrow", bookController.BorrowBook)
-			books.POST("/borrows", bookController.BorrowMultipleBook)
+			// buat rekrutmen baru oleh user yang sedang login
+			rekrutmen.POST("", rekrutmenHandler.Create)
 
-			// filtering
+			// cari semua rekrutmen dengan pagination
+			rekrutmen.GET("", rekrutmenHandler.GetAll)
 
-			// status = available / borrowed
-			books.GET("/status/:status", bookController.FindByStatus)
+			// sort / filter rekrutmen berdasarkan tipe
+			rekrutmen.GET("/sort/type", rekrutmenHandler.GetByType)
 
-			// categories, untuk mencari buku berdasarkan kategori
-			books.GET("/categories", categoryController.GetAllCategories)
-			books.GET("/category/:category", bookController.FindByCategory)
+			// sort / filter rekrutmen berdasarkan role
+			rekrutmen.GET("/sort/role", rekrutmenHandler.GetByRole)
 
-			// searching : /books/search?q=harry
-			books.GET("/search", bookController.SearchBooks)
+			// tampilkan semua rekrutmen yang dibuat oleh user yang sedang login
+			rekrutmen.GET("/mine", rekrutmenHandler.GetMyRekrutmen)
+
+			// tampilkan detail rekrutmen berdasarkan id rekrutmen dan id user yang sedang login
+			// hasil: data rekrutmen + list id pendaftar (accepted/pending/rejected)
+			rekrutmen.GET("/:id", rekrutmenHandler.GetByID)
+
+			// update rekrutmen
+			rekrutmen.PUT("/:id", rekrutmenHandler.Update)
+
+			// hapus rekrutmen
+			rekrutmen.DELETE("/:id", rekrutmenHandler.Delete)
+
+			// apply ke rekrutmen dengan id user yang sedang login
+			rekrutmen.POST("/:id/apply", rekrutmenHandler.Apply)
+
+			// upload file CV untuk pendaftaran rekrutmen
+			rekrutmen.POST("/:id/apply/cv", rekrutmenHandler.UploadCV)
+
+			// upload file portfolio untuk pendaftaran rekrutmen
+			rekrutmen.POST("/:id/apply/portfolio", rekrutmenHandler.UploadPortfolio)
+
+			// refresh status pendaftaran setelah disetujui agar user masuk ke tim
+			rekrutmen.PATCH("/:id/apply/:pendaftar_id/status", rekrutmenHandler.RefreshApplyStatus)
+
+			// tampilkan detail pendaftar rekrutmen
+			// hasil: id pendaftar, id rekrutmen, id user, dan detail pendaftar
+			rekrutmen.GET("/:id/applicants/:pendaftar_id", rekrutmenHandler.GetApplicantDetail)
 		}
 
-	}
-
-	// Admin 
-	admin := r.Group("/admin")
-	admin.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
-	{
-		// book
-		books := admin.Group("/books")
+		// tim
+		tim := api.Group("/tim")
 		{
-			books.POST("/returned", bookController.SetMultipleReturnedBook)
-		}
-		
-		book := admin.Group("/book")
-		{
-			book.POST("", bookController.CreateBook)
-			book.GET("", bookController.GetAllBooks)
-			book.GET("/:id", bookController.GetBook)
-			book.PUT("/:id", bookController.UpdateBook)
-			book.DELETE("/:id", bookController.DeleteBook)
+			// tampilkan anggota tim berdasarkan tim
+			tim.GET("/:id/members", rekrutmenHandler.GetTeamMembers)
 
-			book.POST("/cover", bookController.UploadBookPicture)
-			book.POST("/returned", bookController.SetReturnedBook)
-		}
-
-		// category
-		category := admin.Group("/category")
-		{
-			category.POST("", categoryController.CreateCategory)
-			category.GET("", categoryController.GetAllCategories)
-			category.GET("/:id", categoryController.GetCategory)
-			category.PUT("/:id", categoryController.UpdateCategory)
-			category.DELETE("/:id", categoryController.DeleteCategory)
+			// berikan rating ke anggota tim
+			// hanya untuk anggota yang status pendaftarannya accepted
+			tim.POST("/:id/members/:user_id/rating", rekrutmenHandler.GiveMemberRating)
 		}
 	}
 }
