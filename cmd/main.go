@@ -5,9 +5,14 @@ import (
 	"etc-backend/internal/repositories"
 	"etc-backend/internal/routes"
 	"etc-backend/internal/services"
+	"etc-backend/middleware"
 	database "etc-backend/migrations"
+	common "etc-backend/utils/response"
+	"etc-backend/utils/storage"
+	"fmt"
 	"log"
 	"os"
+	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -26,16 +31,21 @@ func main() {
 
 	db := database.ConnectToPostgresql()
 	r := gin.Default()
+	r.Use(middleware.CORSMiddleware())
+	r.Use(handlePanic())
 
 	//
-
 	jwtService := services.NewJWTService()
+	gdrive := storage.NewGdrive()
+
 	// repositories
 	userRepo := repositories.NewUserRepository(db)
 	rekrutmenRepo := repositories.NewRekrutmenRepository(db)
+	settingDriveRepo := repositories.NewSettingDriveRepository(gdrive, db)
 
 	// services
-	userService := services.NewUserService(userRepo, jwtService)
+	settingDriveService := services.NewSettingDriveService(settingDriveRepo, gdrive)
+	userService := services.NewUserService(userRepo, jwtService, settingDriveService, gdrive)
 	rekrutmenService := services.NewRekrutmenService(rekrutmenRepo)
 
 	// handlers
@@ -46,3 +56,27 @@ func main() {
 
 	r.Run(":8080")
 }
+
+
+func handlePanic() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		defer func() {
+			if r := recover(); r != nil {
+				var err error
+				if e, ok := r.(error); ok {
+					err = e
+				} else {
+					err = fmt.Errorf("%v", r)
+				}
+				fmt.Printf("\n[recovery] panic occurred: %v\n", err)
+				stack := debug.Stack()
+				fmt.Fprintln(os.Stderr, string(stack))
+
+				common.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+			}
+		}()
+
+		ctx.Next()
+	}
+}
+

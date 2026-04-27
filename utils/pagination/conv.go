@@ -23,3 +23,8 @@ func ToInt(i string) int {
 	}
 	return res
 }
+
+func FromInt(i int) string {
+	return strconv.Itoa(i)
+}
+

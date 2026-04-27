@@ -1,13 +1,16 @@
 package services
 
 import (
+	"context"
+	"errors"
 	"etc-backend/constants"
 	"etc-backend/internal/dtos"
 	"etc-backend/internal/models"
 	"etc-backend/internal/repositories"
-	"context"
-	"errors"
-	"os"
+	"etc-backend/utils/storage"
+	"fmt"
+
+	// "os"
 	"sync"
 	"time"
 
@@ -18,21 +21,27 @@ import (
 type (
 	UserService interface {
 		Register(ctx context.Context, req dtos.UserRegisterRequest) (dtos.UserRegisterResponse, error)
-		RegisterAdmin(ctx context.Context, req dtos.AdminRegisterRequest) (dtos.UserRegisterResponse, error)
+		// RegisterAdmin(ctx context.Context, req dtos.AdminRegisterRequest) (dtos.UserRegisterResponse, error)
 		Login(ctx context.Context, req dtos.UserLoginRequest) (dtos.UserLoginResponse, error)
 		UpdateUser(ctx context.Context, userID string, req dtos.UpdateUserRequest) (*dtos.UserResponse, error)
+		GetByID(ctx context.Context, userId string) (dtos.UserGetMe, error)
+		UploadProfilePicture(ctx context.Context, req dtos.UploadProfilePictureRequest, userId string) (dtos.UpdateProfilePictureResponse, error)
 	}
 
 	userService struct {
 		userRepo   repositories.UserRepository
 		jwtService JWTService
+		driveService SettingDriveService
+		gdrive		storage.Gdrive
 	}
 )
 
-func NewUserService(userRepo repositories.UserRepository, jwtService JWTService) UserService {
+func NewUserService(userRepo repositories.UserRepository, jwtService JWTService, driveService SettingDriveService, gdrive storage.Gdrive) UserService {
 	return &userService{
 		userRepo:   userRepo,
 		jwtService: jwtService,
+		driveService: driveService,
+		gdrive: gdrive,
 	}
 }
 
@@ -81,6 +90,52 @@ func (s *userService) Register(ctx context.Context, req dtos.UserRegisterRequest
 	}, nil
 }
 
+func (s *userService) UploadProfilePicture(ctx context.Context, req dtos.UploadProfilePictureRequest, userId string) (dtos.UpdateProfilePictureResponse, error) {
+	if req.ProfilePicture == nil {
+		return dtos.UpdateProfilePictureResponse{}, errors.New("profile picture is required")
+	}
+
+	// filename := userId
+	url, err := s.driveService.UploadFile(constants.DRIVE_USER, userId, req.ProfilePicture)
+
+	user, err := s.userRepo.FindByID(ctx, userId)
+	if err != nil {
+		return dtos.UpdateProfilePictureResponse{}, err
+	}
+
+	link := fmt.Sprintf("https://drive.google.com/file/d/%s/view", url)
+	user.ProfilePicture = &link
+	user.UpdatedAt = time.Now()
+
+	updatedUser, err := s.userRepo.Update(ctx, nil, user)
+	if err != nil {
+		return dtos.UpdateProfilePictureResponse{}, err
+	}
+
+	return dtos.UpdateProfilePictureResponse{
+		ProfilePicture: updatedUser.ProfilePicture,
+	}, nil
+}
+
+func (s *userService) GetByID(ctx context.Context, userId string) (dtos.UserGetMe, error) {
+	user, err := s.userRepo.FindByID(ctx, userId)
+	if err != nil {
+		return dtos.UserGetMe{}, errors.New("user not found")
+	}
+
+	return dtos.UserGetMe{
+		PersonalInfo: dtos.UserResponse{
+			UserID:        user.UserID,
+			Nama:          user.Nama,
+			Jurusan:       user.Jurusan,
+			NRP:           user.NRP,
+			ContactPerson: user.ContactPerson,
+			Role:          user.Role,
+			ProfilePicture: user.ProfilePicture,
+		},
+	}, nil
+}
+
 func (s *userService) Login(ctx context.Context, req dtos.UserLoginRequest) (dtos.UserLoginResponse, error) {
 	user, err := s.userRepo.FindByNRP(ctx, req.NRP)
 	if err != nil {
@@ -102,54 +157,54 @@ func (s *userService) Login(ctx context.Context, req dtos.UserLoginRequest) (dto
 	}, nil
 }
 
-func (s *userService) RegisterAdmin(ctx context.Context, req dtos.AdminRegisterRequest) (dtos.UserRegisterResponse, error) {
-	expectedKey := os.Getenv("ADMIN_SECRET_KEY")
-	if expectedKey == "" {
-		return dtos.UserRegisterResponse{}, errors.New("admin secret key not configured")
-	}
+// func (s *userService) RegisterAdmin(ctx context.Context, req dtos.AdminRegisterRequest) (dtos.UserRegisterResponse, error) {
+// 	expectedKey := os.Getenv("ADMIN_SECRET_KEY")
+// 	if expectedKey == "" {
+// 		return dtos.UserRegisterResponse{}, errors.New("admin secret key not configured")
+// 	}
 
-	if req.SecretKey != expectedKey {
-		return dtos.UserRegisterResponse{}, errors.New("invalid admin secret key")
-	}
+// 	if req.SecretKey != expectedKey {
+// 		return dtos.UserRegisterResponse{}, errors.New("invalid admin secret key")
+// 	}
 
-	existingUser, _ := s.userRepo.FindByNRP(ctx, req.NRP)
-	if existingUser != nil {
-		return dtos.UserRegisterResponse{}, errors.New("nrp already registered")
-	}
+// 	existingUser, _ := s.userRepo.FindByNRP(ctx, req.NRP)
+// 	if existingUser != nil {
+// 		return dtos.UserRegisterResponse{}, errors.New("nrp already registered")
+// 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return dtos.UserRegisterResponse{}, err
-	}
+// 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+// 	if err != nil {
+// 		return dtos.UserRegisterResponse{}, err
+// 	}
 
-	now := time.Now()
-	user := &models.User{
-		UserID:        uuid.New().String(),
-		Nama:          req.Nama,
-		Jurusan:       req.Jurusan,
-		NRP:           req.NRP,
-		ContactPerson: req.ContactPerson,
-		PasswordHash:  string(hashedPassword),
-		Role:          constants.ROLE_ADMIN,
-		CreatedAt:     now,
-		UpdatedAt:     now,
-	}
+// 	now := time.Now()
+// 	user := &models.User{
+// 		UserID:        uuid.New().String(),
+// 		Nama:          req.Nama,
+// 		Jurusan:       req.Jurusan,
+// 		NRP:           req.NRP,
+// 		ContactPerson: req.ContactPerson,
+// 		PasswordHash:  string(hashedPassword),
+// 		Role:          constants.ROLE_ADMIN,
+// 		CreatedAt:     now,
+// 		UpdatedAt:     now,
+// 	}
 
-	createdUser, err := s.userRepo.Create(ctx, nil, user)
-	if err != nil {
-		return dtos.UserRegisterResponse{}, err
-	}
+// 	createdUser, err := s.userRepo.Create(ctx, nil, user)
+// 	if err != nil {
+// 		return dtos.UserRegisterResponse{}, err
+// 	}
 
-	token, err := s.jwtService.GenerateToken(user)
-	if err != nil {
-		return dtos.UserRegisterResponse{}, err
-	}
+// 	token, err := s.jwtService.GenerateToken(user)
+// 	if err != nil {
+// 		return dtos.UserRegisterResponse{}, err
+// 	}
 
-	return dtos.UserRegisterResponse{
-		User:  *dtos.ToUserResponse(createdUser),
-		Token: token,
-	}, nil
-}
+// 	return dtos.UserRegisterResponse{
+// 		User:  *dtos.ToUserResponse(createdUser),
+// 		Token: token,
+// 	}, nil
+// }
 
 func (s *userService) UpdateUser(ctx context.Context, userID string, req dtos.UpdateUserRequest) (*dtos.UserResponse, error) {
 	user, err := s.userRepo.FindByID(ctx, userID)

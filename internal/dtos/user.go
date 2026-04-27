@@ -3,7 +3,8 @@ package dtos
 
 import (
 	"etc-backend/internal/models"
-	"time"
+	"mime/multipart"
+	// "time"
 )
 
 type UserRegisterRequest struct {
@@ -18,7 +19,6 @@ type UserLoginRequest struct {
 	NRP      string `json:"nrp" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
-
 
 type UserRegisterResponse struct {
 	User  UserResponse `json:"user"`
@@ -37,8 +37,21 @@ type UserResponse struct {
 	NRP           string    `json:"nrp"`
 	ContactPerson string    `json:"contact_person"`
 	Role          string    `json:"role"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	ProfilePicture *string   `json:"profile_picture"`
+	// CreatedAt     time.Time `json:"created_at"`
+	// UpdatedAt     time.Time `json:"updated_at"`
+}
+
+type UserGetMe struct {
+	PersonalInfo UserResponse `json:"personal_info"`
+}
+
+type UploadProfilePictureRequest struct {
+	ProfilePicture *multipart.FileHeader `form:"profile_picture" binding:"required"`
+}
+
+type UpdateProfilePictureResponse struct {
+	ProfilePicture *string `json:"profile_picture"`
 }
 
 func ToUserResponse(user *models.User) *UserResponse {
@@ -49,8 +62,9 @@ func ToUserResponse(user *models.User) *UserResponse {
 		NRP:           user.NRP,
 		ContactPerson: user.ContactPerson,
 		Role:          user.Role,
-		CreatedAt:     user.CreatedAt,
-		UpdatedAt:     user.UpdatedAt,
+		ProfilePicture: user.ProfilePicture,
+		// CreatedAt:     user.CreatedAt,
+		// UpdatedAt:     user.UpdatedAt,
 	}
 }
 
