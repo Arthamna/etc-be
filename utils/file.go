@@ -1,4 +1,4 @@
-package pkg
+package utils
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -73,5 +74,17 @@ func GetMimetype(f multipart.File) (string, error) {
 	}
 
 	return mimeType, nil
+}
+
+func ToInt(i string) int {
+	res, err := strconv.Atoi(i)
+	if err != nil {
+		return 0
+	}
+	return res
+}
+
+func FromInt(i int) string {
+	return strconv.Itoa(i)
 }
 

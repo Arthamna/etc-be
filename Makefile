@@ -1,5 +1,5 @@
 up:
-	docker compose -p rplibrary up -d
+	docker compose -p etc up -d
 
 down:
-	docker compose -p rplibrary down
+	docker compose -p etc down

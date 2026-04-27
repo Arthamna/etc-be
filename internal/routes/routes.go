@@ -1,15 +1,15 @@
 package routes
 
 import (
-	"arthamna/rplLibrary/internal/handlers"
-	"arthamna/rplLibrary/pkg/middleware"
+	"etc-backend/internal/handlers"
+	"etc-backend/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, userController handlers.UserHandler, bookController handlers.BookHandler, categoryController handlers.CategoryHandler) {
-	
-	// auth
+func SetupRoutes(r *gin.Engine, userHandler handlers.UserHandler, rekrutmenHandler handlers.RekrutmenHandler) {
+
+	// user
 	auth := r.Group("/auth")
 	{
 		// register user sekaligus onboarding data awal user
