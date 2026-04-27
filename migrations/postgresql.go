@@ -1,8 +1,8 @@
 package database
 
 import (
-	"arthamna/rplLibrary/internal/models"
-	// "arthamna/rplLibrary/pkg/database/migrations"
+	"etc-backend/internal/models"
+	// "etc-backend/pkg/database/migrations"
 	"fmt"
 	"log"
 	"os"
@@ -56,11 +56,9 @@ func AutoMigrateAll(db *gorm.DB) error {
 	// db.Migrator().DropTable(&models.Category{}, &models.User{} , &models.Article{}) 
 	
 	if err := db.AutoMigrate(
-        &models.User{}, 
-        &models.Category{}, 
-        &models.Book{},
-        &models.BookBorrowing{},
-        &models.BookCategory{},
+        &models.User{},
+        &models.Rekrutmen{},
+        &models.SettingDrive{},
     ); err != nil {
 		return err
 	}

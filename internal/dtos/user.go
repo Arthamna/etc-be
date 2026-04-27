@@ -2,30 +2,22 @@
 package dtos
 
 import (
-	"arthamna/rplLibrary/internal/models"
-	"encoding/base64"
+	"etc-backend/internal/models"
 	"mime/multipart"
-	"time"
+	// "time"
 )
 
 type UserRegisterRequest struct {
-	Username string `json:"username" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
-}
-
-type UploadProfilePictureRequest struct {
-	ProfilePicture *multipart.FileHeader `form:"profile_picture" binding:"required"`
+	Nama          string `json:"nama" binding:"required"`
+	Jurusan       string `json:"jurusan" binding:"required"`
+	NRP           string `json:"nrp" binding:"required"`
+	ContactPerson string `json:"contact_person" binding:"required"`
+	Password      string `json:"password" binding:"required,min=6"`
 }
 
 type UserLoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
+	NRP      string `json:"nrp" binding:"required"`
 	Password string `json:"password" binding:"required"`
-}
-type UserUpdateRequest struct {
-	Username string `json:"username" binding:""`
-	Email    string `json:"email" binding:"email"`
-	Password string `json:"password" binding:""`
 }
 
 type UserRegisterResponse struct {
@@ -39,35 +31,40 @@ type UserLoginResponse struct {
 }
 
 type UserResponse struct {
-	UserID           string    `json:"user_id"`
-	Username         string    `json:"username"`
-	Email            string    `json:"email"`
-	ProfilePicture   string    `json:"profile_picture"`
-	Role             string    `json:"role"`
-	RegistrationDate time.Time `json:"registration_date"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
+	UserID        string    `json:"user_id"`
+	Nama          string    `json:"nama"`
+	Jurusan       string    `json:"jurusan"`
+	NRP           string    `json:"nrp"`
+	ContactPerson string    `json:"contact_person"`
+	Role          string    `json:"role"`
+	ProfilePicture *string   `json:"profile_picture"`
+	// CreatedAt     time.Time `json:"created_at"`
+	// UpdatedAt     time.Time `json:"updated_at"`
+}
+
+type UserGetMe struct {
+	PersonalInfo UserResponse `json:"personal_info"`
+}
+
+type UploadProfilePictureRequest struct {
+	ProfilePicture *multipart.FileHeader `form:"profile_picture" binding:"required"`
 }
 
 type UpdateProfilePictureResponse struct {
-	ProfilePicture string `json:"profile_picture"`
+	ProfilePicture *string `json:"profile_picture"`
 }
 
 func ToUserResponse(user *models.User) *UserResponse {
-	profilePicture := ""
-	if len(user.ProfilePicture) > 0 {
-		profilePicture = base64.StdEncoding.EncodeToString(user.ProfilePicture)
-	}
-
 	return &UserResponse{
-		UserID:           user.UserID,
-		Username:         user.Username,
-		Email:            user.Email,
-		ProfilePicture:   profilePicture,
-		Role:             user.Role,
-		RegistrationDate: user.RegistrationDate,
-		CreatedAt:        user.CreatedAt,
-		UpdatedAt:        user.UpdatedAt,
+		UserID:        user.UserID,
+		Nama:          user.Nama,
+		Jurusan:       user.Jurusan,
+		NRP:           user.NRP,
+		ContactPerson: user.ContactPerson,
+		Role:          user.Role,
+		ProfilePicture: user.ProfilePicture,
+		// CreatedAt:     user.CreatedAt,
+		// UpdatedAt:     user.UpdatedAt,
 	}
 }
 
@@ -80,8 +77,17 @@ func ToUserResponseList(users []models.User) []*UserResponse {
 }
 
 type AdminRegisterRequest struct {
-	Username  string `json:"username" binding:"required"`
-	Email     string `json:"email" binding:"required,email"`
-	Password  string `json:"password" binding:"required,min=6"`
-	SecretKey string `json:"secret_key" binding:"required"`
+	Nama          string `json:"nama" binding:"required"`
+	Jurusan       string `json:"jurusan" binding:"required"`
+	NRP           string `json:"nrp" binding:"required"`
+	ContactPerson string `json:"contact_person" binding:"required"`
+	Password      string `json:"password" binding:"required,min=6"`
+	SecretKey     string `json:"secret_key" binding:"required"`
+}
+
+type UpdateUserRequest struct {
+	Nama          string `json:"nama"`
+	Jurusan       string `json:"jurusan"`
+	ContactPerson string `json:"contact_person"`
+	Role          string `json:"role"` // "mahasiswa" atau "dosen"
 }

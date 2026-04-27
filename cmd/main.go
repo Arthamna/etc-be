@@ -1,14 +1,18 @@
 package main
 
 import (
-	"arthamna/rplLibrary/internal/handlers"
-	"arthamna/rplLibrary/internal/repositories"
-	"arthamna/rplLibrary/internal/routes"
-	"arthamna/rplLibrary/internal/services"
-	"arthamna/rplLibrary/pkg/auth"
-	"arthamna/rplLibrary/pkg/database"
+	"etc-backend/internal/handlers"
+	"etc-backend/internal/repositories"
+	"etc-backend/internal/routes"
+	"etc-backend/internal/services"
+	"etc-backend/middleware"
+	database "etc-backend/migrations"
+	common "etc-backend/utils/response"
+	"etc-backend/utils/storage"
+	"fmt"
 	"log"
 	"os"
+	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -27,27 +31,52 @@ func main() {
 
 	db := database.ConnectToPostgresql()
 	r := gin.Default()
+	r.Use(middleware.CORSMiddleware())
+	r.Use(handlePanic())
 
 	//
+	jwtService := services.NewJWTService()
+	gdrive := storage.NewGdrive()
 
-	jwtService := auth.NewJWTService()
 	// repositories
 	userRepo := repositories.NewUserRepository(db)
-	bookRepo := repositories.NewBookRepository(db)
-	bookBorrowing := repositories.NewBookBorrowingRepository(db)
-	categoryRepo := repositories.NewCategoryRepository(db)
+	rekrutmenRepo := repositories.NewRekrutmenRepository(db)
+	settingDriveRepo := repositories.NewSettingDriveRepository(gdrive, db)
 
 	// services
-	userService := services.NewUserService(userRepo, jwtService)
-	bookService := services.NewBookService(bookRepo, categoryRepo, userRepo, bookBorrowing)
-	categoryService := services.NewCategoryService(categoryRepo)
+	settingDriveService := services.NewSettingDriveService(settingDriveRepo, gdrive)
+	userService := services.NewUserService(userRepo, jwtService, settingDriveService, gdrive)
+	rekrutmenService := services.NewRekrutmenService(rekrutmenRepo)
 
 	// handlers
 	userController := handlers.NewUserHandler(userService)
-	bookController := handlers.NewBookHandler(bookService)
-	categoryController := handlers.NewCategoryHandler(categoryService)
+	rekrutmenController := handlers.NewRekrutmenHandler(rekrutmenService)
 
-	routes.SetupRoutes(r, userController, bookController, categoryController)
+	routes.SetupRoutes(r, userController, rekrutmenController)
 
 	r.Run(":8080")
 }
+
+
+func handlePanic() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		defer func() {
+			if r := recover(); r != nil {
+				var err error
+				if e, ok := r.(error); ok {
+					err = e
+				} else {
+					err = fmt.Errorf("%v", r)
+				}
+				fmt.Printf("\n[recovery] panic occurred: %v\n", err)
+				stack := debug.Stack()
+				fmt.Fprintln(os.Stderr, string(stack))
+
+				common.BuildErrorResponse("Internal Server Error", err.Error(), nil)
+			}
+		}()
+
+		ctx.Next()
+	}
+}
+

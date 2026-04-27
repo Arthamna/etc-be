@@ -1,0 +1,60 @@
+info:
+  name: Upload PP
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: http://localhost:8080/auth/picture
+  body:
+    type: multipart-form
+    data:
+      - name: profile_picture
+        type: file
+        value: &a1
+          - C:\Users\LEGION SLIM 5\Pictures\Screenshots\Catboost.png
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZmMxNTM1NGUtNGQ0My00NzVlLWEyMGMtZGY2MWMyYjZkODA4Iiwicm9sZSI6InVzZXIiLCJpc3MiOiJycExpYnJhcnkiLCJleHAiOjE3NzcyNzQ3ODIsImlhdCI6MTc3NzI2NzU4Mn0.5ayvDeQxe5vtSduG0rK2NhhKqPkCyIKZgjCH0gmZ6TE
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: http://localhost:8080/auth/picture
+      method: POST
+      body:
+        type: multipart-form
+        data:
+          - name: profile_picture
+            type: file
+            value: *a1
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With
+        - name: access-control-allow-methods
+          value: POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE
+        - name: access-control-allow-origin
+          value: "*"
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Mon, 27 Apr 2026 06:09:01 GMT
+        - name: content-length
+          value: "92"
+      body:
+        type: json
+        data: |-
+          {
+            "profile_picture": "https://drive.google.com/file/d/14QmDTE8Q_g2lRsGSHZyAfQlOygeBZI1U/view"
+          }

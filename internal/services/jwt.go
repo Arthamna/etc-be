@@ -1,8 +1,8 @@
 package services
 
 import (
-	"arthamna/rplLibrary/constants"
-	"arthamna/rplLibrary/internal/models"
+	"etc-backend/constants"
+	"etc-backend/internal/models"
 	"errors"
 	"log"
 	"os"
