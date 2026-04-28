@@ -1,34 +1,31 @@
-fitur :
+Fitur :
 
 auth :
 - daftar 
 - login
 
 user :
-- update user (termasuk di onboarding)
-- cari rekrutmen
-- tampilkan bookmark 
-- apply rekrutmen
-- endpoint upload gambar dijadikan upload file untuk apply rekrutmen (setup storage dulu)
-
-- kelola daftar rekrutmen
-- buat rekrutmen
-
+- update user (termasuk saat onboarding/register tersebut)
+- tampilkan bookmark (dari user itu saja)
 
 rekrutmen :
-- pagination (default)
+
+- cari rekrutmen (get all rekrutmen with pagination)
 - sort dari tipe
 - sort dari role
-- bookmark
 
-- detail pendaftar rekrutmen (dashboard user)
-- tampilkan tim sekarang (based on rekrutmen)
-- detail anggota tim 
-- berikan review, hanya bisa dari tim yang sama
+- apply rekrutmen (id user tersebut)
+- upload file cv
+- upload file portfolio
 
+- kalau disetujui, user akan masuk ke tim (refresh status)
+- tampilkan anggota tim 
+- berikan rating ke anggota tim
+ 
 
-# Outline
-- implementasi api
-- setup storage
-- setup cors
-- 
+- buat rekrutmen (id user tersebut)
+
+- tampilkan semua rekrutmen yang sudah dibuat (id user)
+- tampilkan detail rekrutmen (id rekrutmen, id user tersebut), hasilnya model rekrutmen dan list id pendaftar (baik yang accepted, pending, atau rejected)
+- tampilkan detail pendaftar rekrutmen (id pendaftar, id rekrutmen, id user)
+- berikan rating ke anggota tim (yang status pendaftarnya adalah accepted)

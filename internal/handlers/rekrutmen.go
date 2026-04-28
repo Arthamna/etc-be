@@ -16,6 +16,15 @@ type RekrutmenHandler interface {
 	GetMyRekrutmen(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
+	GetByType(c *gin.Context)
+	GetByRole(c *gin.Context)
+	Apply(c *gin.Context)
+	UploadCV(c *gin.Context)
+	UploadPortfolio(c *gin.Context)
+	RefreshApplyStatus(c *gin.Context)
+	GetApplicantDetail(c *gin.Context)
+	GetTeamMembers(c *gin.Context)
+	GiveMemberRating(c *gin.Context)
 }
 
 type rekrutmenHandler struct {
@@ -113,4 +122,147 @@ func (h *rekrutmenHandler) Delete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "rekrutmen berhasil dihapus"})
+}
+
+func (h *rekrutmenHandler) GetByType(c *gin.Context) {
+    kegiatan := c.Query("kegiatan")
+    page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+    limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+    result, err := h.rekrutmenService.GetAll(c.Request.Context(), page, limit, kegiatan, "", "")
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, result)
+}
+
+func (h *rekrutmenHandler) GetByRole(c *gin.Context) {
+    role := c.Query("role")
+    page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+    limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+    result, err := h.rekrutmenService.GetAll(c.Request.Context(), page, limit, "", role, "")
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, result)
+}
+
+func (h *rekrutmenHandler) Apply(c *gin.Context) {
+    userID := c.MustGet("user_id").(string)
+    rekrutmenID := c.Param("id")
+
+    var req dtos.ApplyRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    result, err := h.rekrutmenService.Apply(c.Request.Context(), userID, rekrutmenID, req)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusCreated, result)
+}
+
+func (h *rekrutmenHandler) UploadCV(c *gin.Context) {
+    userID := c.MustGet("user_id").(string)
+    rekrutmenID := c.Param("id")
+
+    file, err := c.FormFile("cv")
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "file cv diperlukan"})
+        return
+    }
+
+    result, err := h.rekrutmenService.UploadCV(c.Request.Context(), userID, rekrutmenID, file)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, result)
+}
+
+func (h *rekrutmenHandler) UploadPortfolio(c *gin.Context) {
+    userID := c.MustGet("user_id").(string)
+    rekrutmenID := c.Param("id")
+
+    file, err := c.FormFile("portfolio")
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "file portfolio diperlukan"})
+        return
+    }
+
+    result, err := h.rekrutmenService.UploadPortfolio(c.Request.Context(), userID, rekrutmenID, file)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, result)
+}
+
+func (h *rekrutmenHandler) RefreshApplyStatus(c *gin.Context) {
+    rekrutmenID := c.Param("id")
+    pendaftarID := c.Param("pendaftar_id")
+
+    var req dtos.UpdateApplyStatusRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    if err := h.rekrutmenService.UpdateApplyStatus(c.Request.Context(), rekrutmenID, pendaftarID, req.Status); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "status pendaftar berhasil diperbarui"})
+}
+
+func (h *rekrutmenHandler) GetApplicantDetail(c *gin.Context) {
+    rekrutmenID := c.Param("id")
+    pendaftarID := c.Param("pendaftar_id")
+
+    result, err := h.rekrutmenService.GetApplicantDetail(c.Request.Context(), rekrutmenID, pendaftarID)
+    if err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, result)
+}
+
+func (h *rekrutmenHandler) GetTeamMembers(c *gin.Context) {
+    timID := c.Param("id")
+
+    result, err := h.rekrutmenService.GetTeamMembers(c.Request.Context(), timID)
+    if err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, result)
+}
+
+func (h *rekrutmenHandler) GiveMemberRating(c *gin.Context) {
+    reviewerUserID := c.MustGet("user_id").(string)
+    timID := c.Param("id")
+    targetUserID := c.Param("user_id")
+
+    var req dtos.GiveMemberRatingRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    if err := h.rekrutmenService.GiveMemberRating(c.Request.Context(), reviewerUserID, timID, targetUserID, req.Rating, req.Deskripsi); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusCreated, gin.H{"message": "rating berhasil diberikan"})
 }

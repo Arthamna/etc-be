@@ -13,7 +13,8 @@ type Rekrutmen struct {
 	Role           string    `gorm:"column:role"`
 	ContactPerson  string    `gorm:"column:contact_person"`
 
-	User User `gorm:"foreignKey:UserID;references:UserID"`
+	User      User        `gorm:"foreignKey:UserID;references:UserID"`
+	Pendaftar []Pendaftar `gorm:"foreignKey:RekrutmenID;references:RekrutmenID"`
+	Bookmarks []Bookmark  `gorm:"foreignKey:RekrutmenID;references:RekrutmenID"`
+	Tims      []Tim       `gorm:"foreignKey:RekrutmenID;references:RekrutmenID"`
 }
-
-func (Rekrutmen) TableName() string { return "rekrutmen" }

@@ -55,39 +55,47 @@ type UpdateProfilePictureResponse struct {
 }
 
 func ToUserResponse(user *models.User) *UserResponse {
-	return &UserResponse{
-		UserID:        user.UserID,
-		Nama:          user.Nama,
-		Jurusan:       user.Jurusan,
-		NRP:           user.NRP,
-		ContactPerson: user.ContactPerson,
-		Role:          user.Role,
-		ProfilePicture: user.ProfilePicture,
-		// CreatedAt:     user.CreatedAt,
-		// UpdatedAt:     user.UpdatedAt,
-	}
+    nrp := ""
+    if user.NRP != nil {
+        nrp = *user.NRP
+    }
+    return &UserResponse{
+        UserID:         user.UserID,
+        Nama:           user.Nama,
+        Jurusan:        user.Jurusan,
+        NRP:            nrp,
+        ContactPerson:  user.NoTelp,
+        Role:           user.Role,
+        ProfilePicture: user.ProfilePicture,
+    }
 }
 
-func ToUserResponseList(users []models.User) []*UserResponse {
-	var responses []*UserResponse
-	for _, user := range users {
-		responses = append(responses, ToUserResponse(&user))
-	}
-	return responses
-}
+// func ToUserResponseList(users []models.User) []*UserResponse {
+// 	var responses []*UserResponse
+// 	for _, user := range users {
+// 		responses = append(responses, ToUserResponse(&user))
+// 	}
+// 	return responses
+// }
 
-type AdminRegisterRequest struct {
-	Nama          string `json:"nama" binding:"required"`
-	Jurusan       string `json:"jurusan" binding:"required"`
-	NRP           string `json:"nrp" binding:"required"`
-	ContactPerson string `json:"contact_person" binding:"required"`
-	Password      string `json:"password" binding:"required,min=6"`
-	SecretKey     string `json:"secret_key" binding:"required"`
-}
+// type AdminRegisterRequest struct {
+// 	Nama          string `json:"nama" binding:"required"`
+// 	Jurusan       string `json:"jurusan" binding:"required"`
+// 	NRP           string `json:"nrp" binding:"required"`
+// 	ContactPerson string `json:"contact_person" binding:"required"`
+// 	Password      string `json:"password" binding:"required,min=6"`
+// 	SecretKey     string `json:"secret_key" binding:"required"`
+// }
 
 type UpdateUserRequest struct {
 	Nama          string `json:"nama"`
 	Jurusan       string `json:"jurusan"`
 	ContactPerson string `json:"contact_person"`
 	Role          string `json:"role"` // "mahasiswa" atau "dosen"
+}
+
+type BookmarkResponse struct {
+    ID          string            `json:"id"`
+    RekrutmenID string            `json:"rekrutmen_id"`
+    Rekrutmen   RekrutmenResponse `json:"rekrutmen"`
 }
