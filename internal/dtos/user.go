@@ -54,19 +54,21 @@ type UpdateProfilePictureResponse struct {
 	ProfilePicture *string `json:"profile_picture"`
 }
 
-// func ToUserResponse(user *models.User) *UserResponse {
-// 	return &UserResponse{
-// 		UserID:        user.UserID,
-// 		Nama:          user.Nama,
-// 		Jurusan:       user.Jurusan,
-// 		NRP:           user.NRP,
-// 		ContactPerson: user.ContactPerson,
-// 		Role:          user.Role,
-// 		ProfilePicture: user.ProfilePicture,
-// 		// CreatedAt:     user.CreatedAt,
-// 		// UpdatedAt:     user.UpdatedAt,
-// 	}
-// }
+func ToUserResponse(user *models.User) *UserResponse {
+    nrp := ""
+    if user.NRP != nil {
+        nrp = *user.NRP
+    }
+    return &UserResponse{
+        UserID:         user.UserID,
+        Nama:           user.Nama,
+        Jurusan:        user.Jurusan,
+        NRP:            nrp,
+        ContactPerson:  user.NoTelp,
+        Role:           user.Role,
+        ProfilePicture: user.ProfilePicture,
+    }
+}
 
 // func ToUserResponseList(users []models.User) []*UserResponse {
 // 	var responses []*UserResponse
@@ -90,4 +92,10 @@ type UpdateUserRequest struct {
 	Jurusan       string `json:"jurusan"`
 	ContactPerson string `json:"contact_person"`
 	Role          string `json:"role"` // "mahasiswa" atau "dosen"
+}
+
+type BookmarkResponse struct {
+    ID          string            `json:"id"`
+    RekrutmenID string            `json:"rekrutmen_id"`
+    Rekrutmen   RekrutmenResponse `json:"rekrutmen"`
 }

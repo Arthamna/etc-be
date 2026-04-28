@@ -24,6 +24,7 @@ type (
 		// RegisterAdmin(ctx context.Context, req dtos.AdminRegisterRequest) (dtos.UserRegisterResponse, error)
 		Login(ctx context.Context, req dtos.UserLoginRequest) (dtos.UserLoginResponse, error)
 		UpdateUser(ctx context.Context, userID string, req dtos.UpdateUserRequest) (*dtos.UserResponse, error)
+		GetBookmarks(ctx context.Context, userID string) ([]dtos.BookmarkResponse, error)
 		GetByID(ctx context.Context, userId string) (dtos.UserGetMe, error)
 		UploadProfilePicture(ctx context.Context, req dtos.UploadProfilePictureRequest, userId string) (dtos.UpdateProfilePictureResponse, error)
 	}
@@ -66,8 +67,8 @@ func (s *userService) Register(ctx context.Context, req dtos.UserRegisterRequest
 		UserID:        uuid.NewString(),
 		Nama:          req.Nama,
 		Jurusan:       req.Jurusan,
-		NRP:           req.NRP,
-		ContactPerson: req.ContactPerson,
+		NRP:           &req.NRP,
+		NoTelp:        req.ContactPerson,
 		PasswordHash:  string(hashedPassword),
 		Role:          constants.ROLE_USER,
 		CreatedAt:     now,
@@ -123,13 +124,18 @@ func (s *userService) GetByID(ctx context.Context, userId string) (dtos.UserGetM
 		return dtos.UserGetMe{}, errors.New("user not found")
 	}
 
+	nrp := ""
+	if user.NRP != nil {
+		nrp = *user.NRP
+	}
+
 	return dtos.UserGetMe{
 		PersonalInfo: dtos.UserResponse{
 			UserID:        user.UserID,
 			Nama:          user.Nama,
 			Jurusan:       user.Jurusan,
-			NRP:           user.NRP,
-			ContactPerson: user.ContactPerson,
+			NRP:           nrp,
+			ContactPerson: user.NoTelp,
 			Role:          user.Role,
 			ProfilePicture: user.ProfilePicture,
 		},
@@ -219,7 +225,7 @@ func (s *userService) UpdateUser(ctx context.Context, userID string, req dtos.Up
 		user.Jurusan = req.Jurusan
 	}
 	if req.ContactPerson != "" {
-		user.ContactPerson = req.ContactPerson
+		user.NoTelp = req.ContactPerson
 	}
 	if req.Role != "" {
 		if req.Role != "mahasiswa" && req.Role != "dosen" {
@@ -236,4 +242,21 @@ func (s *userService) UpdateUser(ctx context.Context, userID string, req dtos.Up
 	}
 
 	return dtos.ToUserResponse(updated), nil
+}
+
+func (s *userService) GetBookmarks(ctx context.Context, userID string) ([]dtos.BookmarkResponse, error) {
+    bookmarks, err := s.userRepo.FindBookmarksByUserID(ctx, userID)
+    if err != nil {
+        return nil, err
+    }
+
+    var responses []dtos.BookmarkResponse
+    for _, b := range bookmarks {
+        responses = append(responses, dtos.BookmarkResponse{
+            ID:          b.ID,
+            RekrutmenID: b.RekrutmenID,
+            Rekrutmen:   dtos.ToRekrutmenResponse(&b.Rekrutmen),
+        })
+    }
+    return responses, nil
 }

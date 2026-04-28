@@ -41,12 +41,15 @@ func main() {
 	// repositories
 	userRepo := repositories.NewUserRepository(db)
 	rekrutmenRepo := repositories.NewRekrutmenRepository(db)
+	pendaftarRepo := repositories.NewPendaftarRepository(db)
+	timRepo := repositories.NewTimRepository(db)
+	historyRepo := repositories.NewHistoryRepository(db)
 	settingDriveRepo := repositories.NewSettingDriveRepository(gdrive, db)
 
 	// services
 	settingDriveService := services.NewSettingDriveService(settingDriveRepo, gdrive)
 	userService := services.NewUserService(userRepo, jwtService, settingDriveService, gdrive)
-	rekrutmenService := services.NewRekrutmenService(rekrutmenRepo)
+	rekrutmenService := services.NewRekrutmenService(rekrutmenRepo, pendaftarRepo, timRepo, historyRepo, settingDriveService)
 
 	// handlers
 	userController := handlers.NewUserHandler(userService)

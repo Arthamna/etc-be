@@ -15,6 +15,7 @@ type UserRepository interface {
 	FindByID(ctx context.Context,  id string) (*models.User, error)
 	Update(ctx context.Context, tx *gorm.DB, user *models.User) (*models.User, error)
 	Delete(ctx context.Context, tx *gorm.DB, id string) error
+	FindBookmarksByUserID(ctx context.Context, userID string) ([]models.Bookmark, error)
 }
 
 type userRepository struct {
@@ -81,4 +82,16 @@ func (r *userRepository) Update(ctx context.Context, tx *gorm.DB, user *models.U
 func (r *userRepository) Delete(ctx context.Context, tx *gorm.DB, id string) error {
 	db := r.dbOrTx(tx)
 	return db.WithContext(ctx).Delete(&models.User{}, "user_id = ?", id).Error
+}
+
+func (r *userRepository) FindBookmarksByUserID(ctx context.Context, userID string) ([]models.Bookmark, error) {
+    var bookmarks []models.Bookmark
+    if err := r.db.WithContext(ctx).
+        Preload("Rekrutmen").
+        Preload("Rekrutmen.User").
+        Where("user_id = ?", userID).
+        Find(&bookmarks).Error; err != nil {
+        return nil, err
+    }
+    return bookmarks, nil
 }
