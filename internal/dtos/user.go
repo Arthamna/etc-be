@@ -8,15 +8,22 @@ import (
 )
 
 type UserRegisterRequest struct {
-	Nama          string `json:"nama" binding:"required"`
-	Jurusan       string `json:"jurusan" binding:"required"`
-	NRP           string `json:"nrp" binding:"required"`
-	ContactPerson string `json:"contact_person" binding:"required"`
-	Password      string `json:"password" binding:"required,min=6"`
+	Nama     string `json:"nama" binding:"required"`
+	Role     string `json:"role" binding:"required,oneof=mahasiswa dosen"`
+	Password string `json:"password" binding:"required,min=6"`
+	NoTelp   string `json:"no_telp" binding:"required"`
+
+	// mahasiswa only
+	Jurusan string `json:"jurusan"`
+	NRP     string `json:"nrp"`
+
+	// dosen only
+	NIDN string `json:"nidn"`
 }
 
 type UserLoginRequest struct {
-	NRP      string `json:"nrp" binding:"required"`
+	NRP      string `json:"nrp"`
+	NIDN     string `json:"nidn"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -33,7 +40,7 @@ type UserLoginResponse struct {
 type UserResponse struct {
 	UserID        string    `json:"user_id"`
 	Nama          string    `json:"nama"`
-	Jurusan       string    `json:"jurusan"`
+	Jurusan       *string   `json:"jurusan"`
 	NRP           string    `json:"nrp"`
 	ContactPerson string    `json:"contact_person"`
 	Role          string    `json:"role"`

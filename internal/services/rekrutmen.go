@@ -304,10 +304,14 @@ func (s *rekrutmenService) GetTeamMembers(ctx context.Context, timID string) ([]
 
     var responses []dtos.TimMemberResponse
     for _, p := range tim.Participants {
+        jurusan := ""
+        if p.User.Jurusan != nil {
+            jurusan = *p.User.Jurusan
+        }
         responses = append(responses, dtos.TimMemberResponse{
             UserID:   p.UserID,
             Nama:     p.User.Nama,
-            Jurusan:  p.User.Jurusan,
+            Jurusan:  jurusan,
             MemberKe: p.MemberKe,
         })
     }
