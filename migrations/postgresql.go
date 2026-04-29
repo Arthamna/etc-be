@@ -33,7 +33,10 @@ func ConnectToPostgresql() *gorm.DB {
 		},
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dsn,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{
 		Logger:                                   newLogger,
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
@@ -43,9 +46,9 @@ func ConnectToPostgresql() *gorm.DB {
 
 	fmt.Println("Connected to PostgreSQL successfully!")
 
-	if err := AutoMigrateAll(db); err != nil {
-		log.Fatal(err)
-	}
+	// if err := AutoMigrateAll(db); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	return db
 }

@@ -1,0 +1,79 @@
+info:
+  name: Create
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/rekrutmen
+  body:
+    type: json
+    data: |-
+      {
+        "kegiatan": "projek",
+        "Kriteria": "Menguasai REST API",
+        "tanggal_mulai": "2026-05-01T00:00:00Z",
+        "tanggal_selesai": "2026-05-31T00:00:00Z",
+        "fee": 1500000,
+        "role": "software engineer",
+        "contact_person": "08123456789"
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzQ3NDE4OCwiaWF0IjoxNzc3NDY2OTg4fQ.SXezkjzLDUMcvBAHcQ9IwfxEL9y9HncS2hUbtucE0L8
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: http://localhost:8080/api/rekrutmen
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "kegiatan": "projek",
+            "Kriteria": "Menguasai REST API",
+            "tanggal_mulai": "2026-05-01T00:00:00Z",
+            "tanggal_selesai": "2026-05-31T00:00:00Z",
+            "fee": 1500000,
+            "role": "software engineer",
+            "contact_person": "08123456789"
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With
+        - name: access-control-allow-methods
+          value: POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE
+        - name: access-control-allow-origin
+          value: "*"
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Wed, 29 Apr 2026 13:00:36 GMT
+        - name: content-length
+          value: "308"
+      body:
+        type: json
+        data: |-
+          {
+            "rekrutmen_id": "5db1e7b7-16c2-4876-bea6-f180c60f274c",
+            "user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
+            "kegiatan": "projek",
+            "Kriteria": "Menguasai REST API",
+            "tanggal_mulai": "2026-05-01T00:00:00Z",
+            "tanggal_selesai": "2026-05-31T00:00:00Z",
+            "fee": 1500000,
+            "role": "software engineer",
+            "contact_person": "08123456789"
+          }

@@ -14,6 +14,7 @@ type RekrutmenRepository interface {
 	FindByUserID(ctx context.Context, userID string) ([]models.Rekrutmen, error)
 	Update(ctx context.Context, rekrutmen *models.Rekrutmen) (*models.Rekrutmen, error)
 	Delete(ctx context.Context, id string) error
+	IsOwnedByUser(ctx context.Context, rekrutmenID, userID string) (bool, error)
 }
 
 type rekrutmenRepository struct {
@@ -55,6 +56,16 @@ func (r *rekrutmenRepository) FindAll(ctx context.Context, page, limit int, kegi
 	}
 
 	return rekrutmen, total, nil
+}
+
+func (r *rekrutmenRepository) IsOwnedByUser(ctx context.Context, rekrutmenID, userID string) (bool, error) {
+	var count int64
+	err := r.db.WithContext(ctx).
+		Model(&models.Rekrutmen{}).
+		Where("rekrutmen_id = ? AND user_id = ?", rekrutmenID, userID).
+		Count(&count).Error
+
+	return count > 0, err
 }
 
 func (r *rekrutmenRepository) FindByID(ctx context.Context, id string) (*models.Rekrutmen, error) {

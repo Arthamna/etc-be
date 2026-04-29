@@ -38,7 +38,7 @@ type UserResponse struct {
 	Nama           string   `json:"nama"`
 	Jurusan        *string  `no_telpjson:"jurusan"`
 	NoPengenal     string   `json:"no_pengenal"`
-	NoTelp         string   `json:""`
+	NoTelp         string   `json:"no_telp"`
 	Role           string   `json:"role"`
 	ProfilePicture *string  `json:"profile_picture"`
 	Spesialisasi   []string `json:"spesialisasi"`
@@ -62,12 +62,7 @@ type UpdateUserRequest struct {
 	Nama         string `json:"nama"`
 	Jurusan      string `json:"jurusan"`
 	NoTelp       string `json:"no_telp"`
-	Spesialisasi string `json:"spesialisasi"`
+	Spesialisasi []string `json:"spesialisasi"`
+	NoPengenal   string `json:"no_pengenal"`
 	// Role          string `json:"role"` // "mahasiswa" atau "dosen"
-}
-
-type BookmarkResponse struct {
-	ID          string            `json:"id"`
-	RekrutmenID string            `json:"rekrutmen_id"`
-	Rekrutmen   RekrutmenResponse `json:"rekrutmen"`
 }

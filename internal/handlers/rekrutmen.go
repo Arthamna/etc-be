@@ -11,9 +11,11 @@ import (
 
 type RekrutmenHandler interface {
 	Create(c *gin.Context)
+    GetByID(c *gin.Context)
 	GetAll(c *gin.Context)
-	GetByID(c *gin.Context)
+	GetAppliedByID(c *gin.Context)
 	GetMyRekrutmen(c *gin.Context)
+    AcceptPendaftar(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
 	GetByType(c *gin.Context)
@@ -53,6 +55,18 @@ func (h *rekrutmenHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, result)
 }
 
+func (h *rekrutmenHandler) GetByID(c *gin.Context) {
+    id := c.Param("id")
+
+    result, err := h.rekrutmenService.GetByID(c.Request.Context(), id)
+    if err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, result)
+}
+
 func (h *rekrutmenHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
@@ -69,10 +83,10 @@ func (h *rekrutmenHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-func (h *rekrutmenHandler) GetByID(c *gin.Context) {
+func (h *rekrutmenHandler) GetAppliedByID(c *gin.Context) {
 	id := c.Param("id")
 
-	result, err := h.rekrutmenService.GetByID(c.Request.Context(), id)
+	result, err := h.rekrutmenService.GetAppliedByID(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -125,7 +139,7 @@ func (h *rekrutmenHandler) Delete(c *gin.Context) {
 }
 
 func (h *rekrutmenHandler) GetByType(c *gin.Context) {
-    kegiatan := c.Query("kegiatan")
+    kegiatan := c.Param("type")
     page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
     limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
     result, err := h.rekrutmenService.GetAll(c.Request.Context(), page, limit, kegiatan, "", "")
@@ -137,7 +151,7 @@ func (h *rekrutmenHandler) GetByType(c *gin.Context) {
 }
 
 func (h *rekrutmenHandler) GetByRole(c *gin.Context) {
-    role := c.Query("role")
+    role := c.Param("role")
     page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
     limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
     result, err := h.rekrutmenService.GetAll(c.Request.Context(), page, limit, "", role, "")
@@ -215,12 +229,26 @@ func (h *rekrutmenHandler) RefreshApplyStatus(c *gin.Context) {
         return
     }
 
-    if err := h.rekrutmenService.UpdateApplyStatus(c.Request.Context(), rekrutmenID, pendaftarID, req.Status); err != nil {
+    if err := h.rekrutmenService.RefreshApplyStatus(c.Request.Context(), rekrutmenID, pendaftarID, req.Status); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
 
     c.JSON(http.StatusOK, gin.H{"message": "status pendaftar berhasil diperbarui"})
+}
+
+func (h *rekrutmenHandler) AcceptPendaftar(c *gin.Context) {
+	rekrutmenID := c.Param("rekrutmen_id")
+	pendaftarID := c.Param("pendaftar_id")
+
+    userID := c.MustGet("user_id").(string)
+
+    if err := h.rekrutmenService.AcceptPendaftar(c.Request.Context(), userID, rekrutmenID, pendaftarID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+    c.JSON(http.StatusOK, gin.H{"message": "status pendaftar berhasil diubah menjadi accepted"})
 }
 
 func (h *rekrutmenHandler) GetApplicantDetail(c *gin.Context) {

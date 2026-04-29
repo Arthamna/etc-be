@@ -11,6 +11,8 @@ type PendaftarRepository interface {
     FindByID(ctx context.Context, id string) (*models.Pendaftar, error)
     FindByUserAndRekrutmen(ctx context.Context, userID, rekrutmenID string) (*models.Pendaftar, error)
     UpdateStatus(ctx context.Context, pendaftarID, status string) error
+    UpdateStatusAccepted(ctx context.Context, rekrutmenID, pendaftarID, status string) error
+    FindByRekrutmen(ctx context.Context, rekrutmenID string) (*[]models.Pendaftar, error)
 }
 
 type pendaftarRepository struct {
@@ -50,9 +52,26 @@ func (r *pendaftarRepository) FindByUserAndRekrutmen(ctx context.Context, userID
     return &pendaftar, nil
 }
 
+func (r *pendaftarRepository) FindByRekrutmen(ctx context.Context, rekrutmenID string) (*[]models.Pendaftar, error) {
+    var pendaftar []models.Pendaftar
+    if err := r.db.WithContext(ctx).
+        Where("rekrutmen_id = ?", rekrutmenID).
+        Find(&pendaftar).Error; err != nil {
+        return nil, err
+    }
+    return &pendaftar, nil   
+}
+
 func (r *pendaftarRepository) UpdateStatus(ctx context.Context, pendaftarID, status string) error {
     return r.db.WithContext(ctx).
         Model(&models.Pendaftar{}).
         Where("pendaftar_id = ?", pendaftarID).
         Update("status", status).Error
+}
+
+func (r *pendaftarRepository) UpdateStatusAccepted(ctx context.Context, rekrutmenID, pendaftarID, status string) error {
+	return r.db.WithContext(ctx).
+		Model(&models.Pendaftar{}).
+		Where("pendaftar_id = ? AND rekrutmen_id = ?", pendaftarID, rekrutmenID).
+		Update("status", status).Error
 }

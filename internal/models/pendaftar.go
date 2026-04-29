@@ -9,7 +9,7 @@ type Pendaftar struct {
 	AlasanMendaftar *string    `gorm:"column:alasan_mendaftar"`
 	CVURL           string     `gorm:"column:cv_url"`
 	PortofolioURL   string     `gorm:"column:portofolio_url"`
-	Status          string     `gorm:"column:status"` // diterima atau tidak
+	Status          string     `gorm:"column:status"` // accepted, pending, rejected (habis apply langsung set pending)
 	CreatedAt       *time.Time `gorm:"column:created_at"`
 
 	Rekrutmen Rekrutmen `gorm:"foreignKey:RekrutmenID;references:RekrutmenID"`

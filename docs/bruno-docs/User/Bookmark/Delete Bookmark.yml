@@ -1,19 +1,17 @@
 info:
-  name: Login
+  name: Delete Bookmark
   type: http
-  seq: 1
+  seq: 3
 
 http:
-  method: POST
-  url: http://localhost:8080/auth/login
+  method: DELETE
+  url: http://localhost:8080/auth/5db1e7b7-16c2-4876-bea6-f180c60f274c/bookmark
   body:
     type: json
-    data: |-
-      {
-        "no_pengenal": "5025211001",
-        "password": "rahasia123"
-      }
-  auth: inherit
+    data: ""
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzQ5MjI1MiwiaWF0IjoxNzc3NDg1MDUyfQ.fbemCnoQyOiOiz_OSRhJUMgz-r5J_1pP6Ezr1IEWVLs
 
 settings:
   encodeUrl: true
@@ -24,15 +22,11 @@ settings:
 examples:
   - name: Success
     request:
-      url: http://localhost:8080/auth/login
-      method: POST
+      url: http://localhost:8080/auth/5db1e7b7-16c2-4876-bea6-f180c60f274c/bookmark
+      method: DELETE
       body:
         type: json
-        data: |-
-          {
-            "no_pengenal": "5025211001",
-            "password": "rahasia123"
-          }
+        data: ""
     response:
       status: 200
       statusText: OK
@@ -48,13 +42,12 @@ examples:
         - name: content-type
           value: application/json; charset=utf-8
         - name: date
-          value: Wed, 29 Apr 2026 17:50:52 GMT
+          value: Wed, 29 Apr 2026 18:29:55 GMT
         - name: content-length
-          value: "274"
+          value: "39"
       body:
         type: json
         data: |-
           {
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzQ5MjI1MiwiaWF0IjoxNzc3NDg1MDUyfQ.fbemCnoQyOiOiz_OSRhJUMgz-r5J_1pP6Ezr1IEWVLs",
-            "role": "mahasiswa"
+            "message": "bookmark berhasil dihapus"
           }
