@@ -11,6 +11,7 @@ import (
 type UserRepository interface {
 	Create(ctx context.Context, tx *gorm.DB, user *models.User) (*models.User, error)
 	FindByNRP(ctx context.Context, nrp string) (*models.User, error)
+	FindByNIDN(ctx context.Context, nidn string) (*models.User, error)
 	FindAll(ctx context.Context) ([]models.User, error)
 	FindByID(ctx context.Context,  id string) (*models.User, error)
 	Update(ctx context.Context, tx *gorm.DB, user *models.User) (*models.User, error)
@@ -44,6 +45,18 @@ func (r *userRepository) Create(ctx context.Context, tx *gorm.DB, user *models.U
 func (r *userRepository) FindByNRP(ctx context.Context, nrp string) (*models.User, error) {
 	var user models.User
 	result := r.db.WithContext(ctx).Where("nrp = ?", nrp).First(&user)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return &user, nil
+}
+
+func (r *userRepository) FindByNIDN(ctx context.Context, nidn string) (*models.User, error) {
+	var user models.User
+	result := r.db.WithContext(ctx).Where("nidn = ?", nidn).First(&user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil

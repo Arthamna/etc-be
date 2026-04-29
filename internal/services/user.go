@@ -52,9 +52,26 @@ func (s *userService) Register(ctx context.Context, req dtos.UserRegisterRequest
 	mu.Lock()
 	defer mu.Unlock()
 
-	existingUser, _ := s.userRepo.FindByNRP(ctx, req.NRP)
-	if existingUser != nil {
-		return dtos.UserRegisterResponse{}, errors.New("nrp already registered")
+	// validate based on role
+	if req.Role == "mahasiswa" {
+		if req.NRP == "" {
+			return dtos.UserRegisterResponse{}, errors.New("mahasiswa harus mengisi nrp")
+		}
+		if req.Jurusan == "" {
+			return dtos.UserRegisterResponse{}, errors.New("mahasiswa harus mengisi jurusan")
+		}
+		existing, _ := s.userRepo.FindByNRP(ctx, req.NRP)
+		if existing != nil {
+			return dtos.UserRegisterResponse{}, errors.New("nrp already registered")
+		}
+	} else if req.Role == "dosen" {
+		if req.NIDN == "" {
+			return dtos.UserRegisterResponse{}, errors.New("dosen harus mengisi nidn")
+		}
+		existing, _ := s.userRepo.FindByNIDN(ctx, req.NIDN)
+		if existing != nil {
+			return dtos.UserRegisterResponse{}, errors.New("nidn already registered")
+		}
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
@@ -64,15 +81,20 @@ func (s *userService) Register(ctx context.Context, req dtos.UserRegisterRequest
 
 	now := time.Now()
 	user := &models.User{
-		UserID:        uuid.NewString(),
-		Nama:          req.Nama,
-		Jurusan:       req.Jurusan,
-		NRP:           &req.NRP,
-		NoTelp:        req.ContactPerson,
-		PasswordHash:  string(hashedPassword),
-		Role:          constants.ROLE_USER,
-		CreatedAt:     now,
-		UpdatedAt:     now,
+		UserID:       uuid.NewString(),
+		Nama:         req.Nama,
+		Role:         req.Role,
+		NoTelp:       req.NoTelp,
+		PasswordHash: string(hashedPassword),
+		CreatedAt:    now,
+		UpdatedAt:    now,
+	}
+
+	if req.Role == "mahasiswa" {
+		user.NRP = &req.NRP
+		user.Jurusan = &req.Jurusan
+	} else if req.Role == "dosen" {
+		user.NIDN = &req.NIDN
 	}
 
 	createdUser, err := s.userRepo.Create(ctx, nil, user)
@@ -143,24 +165,36 @@ func (s *userService) GetByID(ctx context.Context, userId string) (dtos.UserGetM
 }
 
 func (s *userService) Login(ctx context.Context, req dtos.UserLoginRequest) (dtos.UserLoginResponse, error) {
-	user, err := s.userRepo.FindByNRP(ctx, req.NRP)
-	if err != nil {
-		return dtos.UserLoginResponse{}, errors.New("invalid nrp")
-	}
+    var user *models.User
+    var err error
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
-		return dtos.UserLoginResponse{}, errors.New("invalid password")
-	}
+    if req.NRP != "" {
+        user, err = s.userRepo.FindByNRP(ctx, req.NRP)
+        if err != nil || user == nil {
+            return dtos.UserLoginResponse{}, errors.New("nrp tidak ditemukan")
+        }
+    } else if req.NIDN != "" {
+        user, err = s.userRepo.FindByNIDN(ctx, req.NIDN)
+        if err != nil || user == nil {
+            return dtos.UserLoginResponse{}, errors.New("nidn tidak ditemukan")
+        }
+    } else {
+        return dtos.UserLoginResponse{}, errors.New("nrp atau nidn harus diisi")
+    }
 
-	token, err := s.jwtService.GenerateToken(user)
-	if err != nil {
-		return dtos.UserLoginResponse{}, err
-	}
+    if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+        return dtos.UserLoginResponse{}, errors.New("password salah")
+    }
 
-	return dtos.UserLoginResponse{
-		Token: token,
-		Role:  user.Role,
-	}, nil
+    token, err := s.jwtService.GenerateToken(user)
+    if err != nil {
+        return dtos.UserLoginResponse{}, err
+    }
+
+    return dtos.UserLoginResponse{
+        Token: token,
+        Role:  user.Role,
+    }, nil
 }
 
 // func (s *userService) RegisterAdmin(ctx context.Context, req dtos.AdminRegisterRequest) (dtos.UserRegisterResponse, error) {
@@ -222,7 +256,7 @@ func (s *userService) UpdateUser(ctx context.Context, userID string, req dtos.Up
 		user.Nama = req.Nama
 	}
 	if req.Jurusan != "" {
-		user.Jurusan = req.Jurusan
+		user.Jurusan = &req.Jurusan
 	}
 	if req.ContactPerson != "" {
 		user.NoTelp = req.ContactPerson

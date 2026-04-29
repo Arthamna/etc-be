@@ -7,7 +7,7 @@ import (
 type User struct {
 	UserID         string    `gorm:"column:user_id;primaryKey"`
 	Nama           string    `gorm:"column:nama"`
-	Jurusan        string    `gorm:"column:jurusan"`
+	Jurusan        *string   `gorm:"column:jurusan"`
 	NRP            *string   `gorm:"column:nrp;unique"`
 	NIDN           *string   `gorm:"column:nidn;unique"`
 	Role           string    `gorm:"column:role"` // dosen atau mahasiswa
