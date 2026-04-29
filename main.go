@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
@@ -20,8 +21,14 @@ import (
 
 
 func main() {
-	if err := godotenv.Load(); err != nil {
+	// disable in docker image
+	if err := loadEnv(); err != nil {
 		log.Fatal("Error loading .env file")
+	}
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
 
 	secretKey := os.Getenv("JWT_SECRET_KEY")
@@ -41,12 +48,15 @@ func main() {
 	// repositories
 	userRepo := repositories.NewUserRepository(db)
 	rekrutmenRepo := repositories.NewRekrutmenRepository(db)
+	pendaftarRepo := repositories.NewPendaftarRepository(db)
+	timRepo := repositories.NewTimRepository(db)
+	historyRepo := repositories.NewHistoryRepository(db)
 	settingDriveRepo := repositories.NewSettingDriveRepository(gdrive, db)
 
 	// services
 	settingDriveService := services.NewSettingDriveService(settingDriveRepo, gdrive)
 	userService := services.NewUserService(userRepo, jwtService, settingDriveService, gdrive)
-	rekrutmenService := services.NewRekrutmenService(rekrutmenRepo)
+	rekrutmenService := services.NewRekrutmenService(rekrutmenRepo, pendaftarRepo, timRepo, historyRepo, settingDriveService)
 
 	// handlers
 	userController := handlers.NewUserHandler(userService)
@@ -57,6 +67,39 @@ func main() {
 	r.Run(":8080")
 }
 
+
+func loadEnv() error {
+	// Get the current working directory
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("error getting current working directory: %v", err)
+	}
+
+	// Get the directory of the executable
+	ex, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("error getting executable path: %v", err)
+	}
+	exPath := filepath.Dir(ex)
+
+	// List of possible locations for .env file
+	envLocations := []string{
+		filepath.Join(cwd, ".env"),
+		filepath.Join(exPath, ".env"),
+		"/var/www/etc-backend/.env", // Add the expected location when run as a service
+	}
+
+	// Try to load .env from each location
+	for _, loc := range envLocations {
+		err := godotenv.Load(loc)
+		if err == nil {
+			fmt.Printf("Loaded .env from: %s\n", loc)
+			return nil
+		}
+	}
+
+	return fmt.Errorf("no .env file found in any of the expected locations")
+}
 
 func handlePanic() gin.HandlerFunc {
 	return func(ctx *gin.Context) {

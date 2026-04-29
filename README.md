@@ -10,11 +10,11 @@ user :
 
 rekrutmen :
 
-- cari rekrutmen (get all rekrutmen with pagination)
+cari rekrutmen (get all rekrutmen with pagination)
 - sort dari tipe
 - sort dari role
 
-- apply rekrutmen (id user tersebut)
+apply rekrutmen (id user tersebut)
 - upload file cv
 - upload file portfolio
 
@@ -23,7 +23,7 @@ rekrutmen :
 - berikan rating ke anggota tim
  
 
-- buat rekrutmen (id user tersebut)
+buat rekrutmen (id user tersebut)
 
 - tampilkan semua rekrutmen yang sudah dibuat (id user)
 - tampilkan detail rekrutmen (id rekrutmen, id user tersebut), hasilnya model rekrutmen dan list id pendaftar (baik yang accepted, pending, atau rejected)

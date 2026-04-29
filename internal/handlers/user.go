@@ -12,10 +12,10 @@ type (
 	UserHandler interface {
 		Register(c *gin.Context)
 		Login(c *gin.Context)
-		// RegisterAdmin(c *gin.Context)
 		UpdateUser(c *gin.Context)
 		GetMe(c *gin.Context)
 		UploadPicture(c *gin.Context)
+		GetBookmarks(c *gin.Context)
 	}
 
 	userHandler struct {
@@ -90,23 +90,6 @@ func (h *userHandler) UploadPicture(c *gin.Context) {
 	c.JSON(http.StatusCreated, user)
 }
 
-
-// func (h *userHandler) RegisterAdmin(c *gin.Context) {
-// 	var req dtos.AdminRegisterRequest
-// 	if err := c.ShouldBindJSON(&req); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-// 	user, err := h.userService.RegisterAdmin(c.Request.Context(), req)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusCreated, user)
-// }
-
 func (h *userHandler) UpdateUser(c *gin.Context) {
 	userID := c.MustGet("user_id").(string)
 
@@ -123,4 +106,16 @@ func (h *userHandler) UpdateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func (h *userHandler) GetBookmarks(c *gin.Context) {
+    userID := c.MustGet("user_id").(string)
+
+    result, err := h.userService.GetBookmarks(c.Request.Context(), userID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, result)
 }
