@@ -15,7 +15,7 @@ http:
           - C:\Users\LEGION SLIM 5\Pictures\Screenshots\Catboost.png
   auth:
     type: bearer
-    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZmMxNTM1NGUtNGQ0My00NzVlLWEyMGMtZGY2MWMyYjZkODA4Iiwicm9sZSI6InVzZXIiLCJpc3MiOiJycExpYnJhcnkiLCJleHAiOjE3NzcyNzQ3ODIsImlhdCI6MTc3NzI2NzU4Mn0.5ayvDeQxe5vtSduG0rK2NhhKqPkCyIKZgjCH0gmZ6TE
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzQ3MTQwNywiaWF0IjoxNzc3NDY0MjA3fQ.8JPfESLBNqv75NvTI1pXrVuZCeu47esLCnNOU0gdXKY
 
 settings:
   encodeUrl: true
@@ -49,12 +49,12 @@ examples:
         - name: content-type
           value: application/json; charset=utf-8
         - name: date
-          value: Mon, 27 Apr 2026 06:09:01 GMT
+          value: Wed, 29 Apr 2026 12:04:32 GMT
         - name: content-length
           value: "92"
       body:
         type: json
         data: |-
           {
-            "profile_picture": "https://drive.google.com/file/d/14QmDTE8Q_g2lRsGSHZyAfQlOygeBZI1U/view"
+            "profile_picture": "https://drive.google.com/file/d/1uStLESBS7LA_duEjhyUzKozjUSyxuDTl/view"
           }

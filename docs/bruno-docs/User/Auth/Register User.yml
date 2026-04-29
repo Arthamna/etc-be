@@ -12,9 +12,11 @@ http:
       {
         "nama": "Budi Santoso",
         "jurusan": "Teknik Informatika",
-        "nrp": "5025211001",
-        "contact_person": "081234567890",
-        "password": "rahasia123"
+        "no_pengenal": "5025211001",
+        "no_telp": "081234567890",
+        "role" : "mahasiswa",
+        "password": "rahasia123",
+        "spesialisasi": ["AI", "Machine Learning", "Data Science"]
       }
   auth: inherit
 
@@ -35,9 +37,11 @@ examples:
           {
             "nama": "Budi Santoso",
             "jurusan": "Teknik Informatika",
-            "nrp": "5025211001",
-            "contact_person": "081234567890",
-            "password": "rahasia123"
+            "no_pengenal": "5025211001",
+            "no_telp": "081234567890",
+            "role" : "mahasiswa",
+            "password": "rahasia123",
+            "spesialisasi": ["AI", "Machine Learning", "Data Science"]
           }
     response:
       status: 201
@@ -54,20 +58,26 @@ examples:
         - name: content-type
           value: application/json; charset=utf-8
         - name: date
-          value: Mon, 27 Apr 2026 05:26:22 GMT
+          value: Wed, 29 Apr 2026 12:02:16 GMT
         - name: content-length
-          value: "424"
+          value: "515"
       body:
         type: json
         data: |-
           {
             "user": {
-              "user_id": "fc15354e-4d43-475e-a20c-df61c2b6d808",
+              "user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
               "nama": "Budi Santoso",
-              "jurusan": "Teknik Informatika",
-              "nrp": "5025211001",
-              "contact_person": "081234567890",
-              "role": "user"
+              "Jurusan": "Teknik Informatika",
+              "no_pengenal": "5025211001",
+              "NoTelp": "081234567890",
+              "role": "mahasiswa",
+              "profile_picture": null,
+              "spesialisasi": [
+                "AI",
+                "Machine Learning",
+                "Data Science"
+              ]
             },
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZmMxNTM1NGUtNGQ0My00NzVlLWEyMGMtZGY2MWMyYjZkODA4Iiwicm9sZSI6InVzZXIiLCJpc3MiOiJycExpYnJhcnkiLCJleHAiOjE3NzcyNzQ3ODIsImlhdCI6MTc3NzI2NzU4Mn0.5ayvDeQxe5vtSduG0rK2NhhKqPkCyIKZgjCH0gmZ6TE"
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzQ3MTMzNiwiaWF0IjoxNzc3NDY0MTM2fQ.JyUk3OyhndCJH8SW7WqbJlqi8dSKkgxTj6RoMWWCUHg"
           }
