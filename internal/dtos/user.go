@@ -2,29 +2,25 @@
 package dtos
 
 import (
-	"etc-backend/internal/models"
 	"mime/multipart"
 	// "time"
 )
 
 type UserRegisterRequest struct {
-	Nama     string `json:"nama" binding:"required"`
-	Role     string `json:"role" binding:"required,oneof=mahasiswa dosen"`
-	Password string `json:"password" binding:"required,min=6"`
-	NoTelp   string `json:"no_telp" binding:"required"`
-
+	Nama string `json:"nama" binding:"required"`
 	// mahasiswa only
-	Jurusan string `json:"jurusan"`
-	NRP     string `json:"nrp"`
+	Jurusan *string `json:"jurusan"`
 
-	// dosen only
-	NIDN string `json:"nidn"`
+	Role         string   `json:"role" binding:"required,oneof=mahasiswa dosen"`
+	Password     string   `json:"password" binding:"required,min=6"`
+	NoTelp       string   `json:"no_telp" binding:"required"`
+	NoPengenal   string   `json:"no_pengenal"`
+	Spesialisasi []string `json:"spesialisasi"`
 }
 
 type UserLoginRequest struct {
-	NRP      string `json:"nrp"`
-	NIDN     string `json:"nidn"`
-	Password string `json:"password" binding:"required"`
+	NoPengenal string `json:"no_pengenal"`
+	Password   string `json:"password" binding:"required"`
 }
 
 type UserRegisterResponse struct {
@@ -38,13 +34,14 @@ type UserLoginResponse struct {
 }
 
 type UserResponse struct {
-	UserID        string    `json:"user_id"`
-	Nama          string    `json:"nama"`
-	Jurusan       *string   `json:"jurusan"`
-	NRP           string    `json:"nrp"`
-	ContactPerson string    `json:"contact_person"`
-	Role          string    `json:"role"`
-	ProfilePicture *string   `json:"profile_picture"`
+	UserID         string   `json:"user_id"`
+	Nama           string   `json:"nama"`
+	Jurusan        *string  `no_telpjson:"jurusan"`
+	NoPengenal     string   `json:"no_pengenal"`
+	NoTelp         string   `json:""`
+	Role           string   `json:"role"`
+	ProfilePicture *string  `json:"profile_picture"`
+	Spesialisasi   []string `json:"spesialisasi"`
 	// CreatedAt     time.Time `json:"created_at"`
 	// UpdatedAt     time.Time `json:"updated_at"`
 }
@@ -61,48 +58,16 @@ type UpdateProfilePictureResponse struct {
 	ProfilePicture *string `json:"profile_picture"`
 }
 
-func ToUserResponse(user *models.User) *UserResponse {
-    nrp := ""
-    if user.NRP != nil {
-        nrp = *user.NRP
-    }
-    return &UserResponse{
-        UserID:         user.UserID,
-        Nama:           user.Nama,
-        Jurusan:        user.Jurusan,
-        NRP:            nrp,
-        ContactPerson:  user.NoTelp,
-        Role:           user.Role,
-        ProfilePicture: user.ProfilePicture,
-    }
-}
-
-// func ToUserResponseList(users []models.User) []*UserResponse {
-// 	var responses []*UserResponse
-// 	for _, user := range users {
-// 		responses = append(responses, ToUserResponse(&user))
-// 	}
-// 	return responses
-// }
-
-// type AdminRegisterRequest struct {
-// 	Nama          string `json:"nama" binding:"required"`
-// 	Jurusan       string `json:"jurusan" binding:"required"`
-// 	NRP           string `json:"nrp" binding:"required"`
-// 	ContactPerson string `json:"contact_person" binding:"required"`
-// 	Password      string `json:"password" binding:"required,min=6"`
-// 	SecretKey     string `json:"secret_key" binding:"required"`
-// }
-
 type UpdateUserRequest struct {
-	Nama          string `json:"nama"`
-	Jurusan       string `json:"jurusan"`
-	ContactPerson string `json:"contact_person"`
-	Role          string `json:"role"` // "mahasiswa" atau "dosen"
+	Nama         string `json:"nama"`
+	Jurusan      string `json:"jurusan"`
+	NoTelp       string `json:"no_telp"`
+	Spesialisasi string `json:"spesialisasi"`
+	// Role          string `json:"role"` // "mahasiswa" atau "dosen"
 }
 
 type BookmarkResponse struct {
-    ID          string            `json:"id"`
-    RekrutmenID string            `json:"rekrutmen_id"`
-    Rekrutmen   RekrutmenResponse `json:"rekrutmen"`
+	ID          string            `json:"id"`
+	RekrutmenID string            `json:"rekrutmen_id"`
+	Rekrutmen   RekrutmenResponse `json:"rekrutmen"`
 }

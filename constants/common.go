@@ -4,6 +4,9 @@ const (
 	// ROLE_ADMIN = "admin"
 	ROLE_USER  = "user"
 
+	USER_NRP  = "mahasiswa"
+	USER_NIDN  = "dosen"
+
 	STATUS_PENDING = "pending"
 	STATUS_APPROVED = "approved"
 	STATUS_REJECTED = "rejected"

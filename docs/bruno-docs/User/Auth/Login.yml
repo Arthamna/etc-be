@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "nrp": "5025211001",
+        "no_pengenal": "5025211001",
         "password": "rahasia123"
       }
   auth: inherit
