@@ -1,0 +1,30 @@
+info:
+  name: update
+  type: http
+  seq: 6
+
+http:
+  method: PUT
+  url: http://localhost:8080/api/rekrutmen/15344251-ba55-447c-9c81-953a34835fcc
+  headers:
+    - name: Authorization
+      value: "{{token.mahasiswa1}}"
+  body:
+    type: json
+    data: |-
+      {
+        "kegiatan": "lomba",
+        "Kriteria": "Mahasiswa aktif S1, IPK minimal 3.0",
+        "tanggal_mulai": "2026-05-01T00:00:00Z",
+        "tanggal_selesai": "2026-06-01T00:00:00Z",
+        "fee": 25000,
+        "role": "Frontend Developer",
+        "contact_person": "0895609474814"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

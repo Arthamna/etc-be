@@ -1,0 +1,25 @@
+info:
+  name: upload CV
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:8080/api/rekrutmen/276b2cde-8d86-422b-b35c-16c721e63513/apply/cv
+  headers:
+    - name: Authorization
+      value: "{{token.mahasiswa1}}"
+  body:
+    type: multipart-form
+    data:
+      - name: cv
+        type: file
+        value:
+          - D:\Zulfiqar\tintin.jpeg
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

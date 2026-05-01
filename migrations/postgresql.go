@@ -46,9 +46,9 @@ func ConnectToPostgresql() *gorm.DB {
 
 	fmt.Println("Connected to PostgreSQL successfully!")
 
-	// if err := AutoMigrateAll(db); err != nil {
-	// 	log.Fatal(err)
-	// }
+	if err := AutoMigrateAll(db); err != nil {
+		log.Fatal(err)
+	}
 
 	return db
 }

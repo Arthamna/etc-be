@@ -1,0 +1,18 @@
+info:
+  name: accept applicant
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: http://localhost:8080/api/rekrutmen/276b2cde-8d86-422b-b35c-16c721e63513/apply/65d5889f-3ed9-4226-a7cc-8c4648983e8e/accept
+  headers:
+    - name: Authorization
+      value: "{{token.dosen1}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

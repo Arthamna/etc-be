@@ -24,6 +24,7 @@ type RekrutmenResponse struct {
 	Fee            float64   `json:"fee"`
 	Role           string    `json:"role"`
 	ContactPerson  string    `json:"contact_person"`
+	TimID          string    `json:"tim_id,omitempty"`
 }
 
 type ApplierRekrutmenResponse struct {
@@ -36,6 +37,7 @@ type ApplierRekrutmenResponse struct {
 	Fee            float64             `json:"fee"`
 	Role           string              `json:"role"`
 	ContactPerson  string              `json:"contact_person"`
+	TimID          string              `json:"tim_id,omitempty"`
 	Pendaftar      []PendaftarResponse `json:"pendaftar"`
 }
 
@@ -62,6 +64,12 @@ type PendaftarResponse struct {
 	PortofolioURL   string  `json:"portofolio_url"`
 	Status          string  `json:"status"`
 	NamaPendaftar   string  `json:"nama_pendaftar"`
+}
+
+type MyApplicationResponse struct {
+    PendaftarID string            `json:"pendaftar_id"`
+    Status      string            `json:"status"`
+    Rekrutmen   RekrutmenResponse `json:"rekrutmen"`
 }
 
 type TimMemberResponse struct {

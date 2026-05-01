@@ -33,5 +33,3 @@ buat rekrutmen (id user tersebut)
 - tampilkan detail rekrutmen (id rekrutmen, id user tersebut), hasilnya model rekrutmen dan list id pendaftar (baik yang accepted, pending, atau rejected) (x)
 - tampilkan detail pendaftar rekrutmen (id pendaftar, id rekrutmen, id user) (x)
 - berikan rating ke anggota tim (yang status pendaftarnya adalah accepted)
-
-- 

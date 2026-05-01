@@ -1,0 +1,18 @@
+info:
+  name: members
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: http://localhost:8080/api/tim/7aa4a015-64d2-44c6-8e42-fdec0c89d0b8/members
+  headers:
+    - name: Authorization
+      value: "{{token.mahasiswa2}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

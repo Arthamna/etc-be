@@ -36,7 +36,7 @@ func (r *rekrutmenRepository) FindAll(ctx context.Context, page, limit int, kegi
 	var rekrutmen []models.Rekrutmen
 	var total int64
 
-	query := r.db.WithContext(ctx).Model(&models.Rekrutmen{}).Preload("User")
+	query := r.db.WithContext(ctx).Model(&models.Rekrutmen{}).Preload("User").Preload("Tims")
 
 	if kegiatan != "" {
 		query = query.Where("kegiatan = ?", kegiatan)
@@ -70,7 +70,7 @@ func (r *rekrutmenRepository) IsOwnedByUser(ctx context.Context, rekrutmenID, us
 
 func (r *rekrutmenRepository) FindByID(ctx context.Context, id string) (*models.Rekrutmen, error) {
 	var rekrutmen models.Rekrutmen
-	if err := r.db.WithContext(ctx).Preload("User").First(&rekrutmen, "rekrutmen_id = ?", id).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("User").Preload("Tims").First(&rekrutmen, "rekrutmen_id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &rekrutmen, nil
@@ -78,7 +78,7 @@ func (r *rekrutmenRepository) FindByID(ctx context.Context, id string) (*models.
 
 func (r *rekrutmenRepository) FindByUserID(ctx context.Context, userID string) ([]models.Rekrutmen, error) {
 	var rekrutmen []models.Rekrutmen
-	if err := r.db.WithContext(ctx).Preload("User").Where("user_id = ?", userID).Find(&rekrutmen).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("User").Preload("Tims").Where("user_id = ?", userID).Find(&rekrutmen).Error; err != nil {
 		return nil, err
 	}
 	return rekrutmen, nil

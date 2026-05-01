@@ -66,6 +66,7 @@ func SetupRoutes(r *gin.Engine, userHandler handlers.UserHandler, rekrutmenHandl
 
 			// set status diterima
 			rekrutmen.PATCH("/:rekrutmen_id/apply/:pendaftar_id/accept", rekrutmenHandler.AcceptPendaftar)
+			rekrutmen.PATCH("/:rekrutmen_id/apply/:pendaftar_id/reject", rekrutmenHandler.RejectPendaftar)
 
 			// update rekrutmen
 			rekrutmen.PUT("/:id", rekrutmenHandler.Update)
@@ -77,6 +78,9 @@ func SetupRoutes(r *gin.Engine, userHandler handlers.UserHandler, rekrutmenHandl
 			// cari semua rekrutmen dengan pagination
 			// contoh : GET /rekrutmen?page=1&limit=10&kegiatan=riset&role=backend&q=java
 			rekrutmen.GET("", rekrutmenHandler.GetAll)
+
+			// tampilkan rekrutmen yang pernah di-apply oleh user yang sedang login
+			rekrutmen.GET("/applied", rekrutmenHandler.GetAppliedRekrutmen)
 
 			// get by id
 			rekrutmen.GET("/:id", rekrutmenHandler.GetByID)
@@ -90,6 +94,7 @@ func SetupRoutes(r *gin.Engine, userHandler handlers.UserHandler, rekrutmenHandl
 			// apply //
 			// apply ke rekrutmen dengan id user yang sedang login
 			rekrutmen.POST("/:id/apply", rekrutmenHandler.Apply)
+
 
 			// upload file CV untuk pendaftaran rekrutmen
 			rekrutmen.POST("/:id/apply/cv", rekrutmenHandler.UploadCV)

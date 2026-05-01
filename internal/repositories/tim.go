@@ -12,6 +12,8 @@ type TimRepository interface {
     FindByRekrutmenID(ctx context.Context, rekrutmenID string) (*models.Tim, error)
     AddParticipant(ctx context.Context, participant *models.TimParticipant) error
     CountParticipants(ctx context.Context, timID string) (int64, error)
+    IsParticipant(ctx context.Context, timID, userID string) (bool, error)
+    RemoveParticipant(ctx context.Context, timID, userID string) error
 }
 
 type timRepository struct {
@@ -58,4 +60,19 @@ func (r *timRepository) CountParticipants(ctx context.Context, timID string) (in
         Where("tim_id = ?", timID).
         Count(&count).Error
     return count, err
+}
+
+func (r *timRepository) IsParticipant(ctx context.Context, timID, userID string) (bool, error) {
+    var count int64
+    err := r.db.WithContext(ctx).
+        Model(&models.TimParticipant{}).
+        Where("tim_id = ? AND user_id = ?", timID, userID).
+        Count(&count).Error
+    return count > 0, err
+}
+
+func (r *timRepository) RemoveParticipant(ctx context.Context, timID, userID string) error {
+    return r.db.WithContext(ctx).
+        Where("tim_id = ? AND user_id = ?", timID, userID).
+        Delete(&models.TimParticipant{}).Error
 }
