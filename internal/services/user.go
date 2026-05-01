@@ -172,7 +172,7 @@ func (s *userService) GetByID(ctx context.Context, userId string) (dtos.UserGetM
 
 func (s *userService) Login(ctx context.Context, req dtos.UserLoginRequest) (dtos.UserLoginResponse, error) {
 	// var user *models.User
-	var err error
+	// var err error
 
 	user, err := s.userRepo.FindByNoPengenal(ctx, req.NoPengenal)
 	if err != nil {

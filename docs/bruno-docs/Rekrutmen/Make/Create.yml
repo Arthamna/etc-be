@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/rekrutmen
+  url: "{{BASE_URL}}/api/rekrutmen"
   body:
     type: json
     data: |-

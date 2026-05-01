@@ -50,7 +50,9 @@ func (r *timRepository) FindByRekrutmenID(ctx context.Context, rekrutmenID strin
 }
 
 func (r *timRepository) AddParticipant(ctx context.Context, participant *models.TimParticipant) error {
-    return r.db.WithContext(ctx).Create(participant).Error
+    return r.db.WithContext(ctx).
+        Omit("Tim", "User").
+        Create(participant).Error
 }
 
 func (r *timRepository) CountParticipants(ctx context.Context, timID string) (int64, error) {

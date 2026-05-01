@@ -1,0 +1,82 @@
+info:
+  name: Check Status
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{BASE_URL}}/api/rekrutmen/applied"
+  body:
+    type: json
+    data: ""
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzY0NjMxOCwiaWF0IjoxNzc3NjM5MTE4fQ.ntU9i81SnoX66eLa0QqzDzkGIjHofboKjNdkr69jEls
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: http://localhost:8080/api/rekrutmen/applied
+      method: GET
+      body:
+        type: json
+        data: ""
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With
+        - name: access-control-allow-methods
+          value: POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE
+        - name: access-control-allow-origin
+          value: "*"
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Fri, 01 May 2026 12:46:08 GMT
+        - name: content-length
+          value: "786"
+      body:
+        type: json
+        data: |-
+          [
+            {
+              "pendaftar_id": "64f1e9ce-e47b-43b2-8d31-9b434a453ac5",
+              "status": "pending",
+              "rekrutmen": {
+                "rekrutmen_id": "ff62ebbc-826e-45aa-b06f-1fda65f4a661",
+                "user_id": "2e98bc24-1705-423f-8da9-97f7537fbff5",
+                "kegiatan": "projek",
+                "Kriteria": "qwerty",
+                "tanggal_mulai": "2026-05-01T00:00:00Z",
+                "tanggal_selesai": "2026-05-09T00:00:00Z",
+                "fee": 2000000,
+                "role": "Frontend website",
+                "contact_person": "viahana@gmail.com"
+              }
+            },
+            {
+              "pendaftar_id": "2e0f2040-d945-4e86-a3bd-456a533d2927",
+              "status": "pending",
+              "rekrutmen": {
+                "rekrutmen_id": "90c2546c-f03e-42ba-b542-e66de6e922d1",
+                "user_id": "2e98bc24-1705-423f-8da9-97f7537fbff5",
+                "kegiatan": "projek",
+                "Kriteria": "hgvgjhiubijjk",
+                "tanggal_mulai": "2026-05-01T00:00:00Z",
+                "tanggal_selesai": "2026-05-09T00:00:00Z",
+                "fee": 2000000,
+                "role": "Frontend website",
+                "contact_person": "viahana@gmail.com"
+              }
+            }
+          ]

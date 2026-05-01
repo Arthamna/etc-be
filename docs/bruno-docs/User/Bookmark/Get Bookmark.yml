@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/auth/bookmarks
+  url: "{{BASE_URL}}/auth/bookmarks"
   auth:
     type: bearer
     token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzQ5MjI1MiwiaWF0IjoxNzc3NDg1MDUyfQ.fbemCnoQyOiOiz_OSRhJUMgz-r5J_1pP6Ezr1IEWVLs

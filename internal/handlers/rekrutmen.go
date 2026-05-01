@@ -87,8 +87,9 @@ func (h *rekrutmenHandler) GetAll(c *gin.Context) {
 
 func (h *rekrutmenHandler) GetAppliedByID(c *gin.Context) {
 	id := c.Param("id")
+	userID := c.MustGet("user_id").(string)
 
-	result, err := h.rekrutmenService.GetAppliedByID(c.Request.Context(), id)
+	result, err := h.rekrutmenService.GetAppliedByID(c.Request.Context(), id, userID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -307,7 +308,7 @@ func (h *rekrutmenHandler) GetTeamMembers(c *gin.Context) {
 func (h *rekrutmenHandler) GiveMemberRating(c *gin.Context) {
 	reviewerUserID := c.MustGet("user_id").(string)
 	timID := c.Param("id")
-	targetUserID := c.Param("user_id")
+	targetUserID := c.Param("target_id")
 
 	var req dtos.GiveMemberRatingRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
