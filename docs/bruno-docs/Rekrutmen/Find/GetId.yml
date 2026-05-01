@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/rekrutmen/b949be2a-55c0-476e-b34e-f2d4e18e0ae2
+  url: "{{BASE_URL}}/api/rekrutmen/b949be2a-55c0-476e-b34e-f2d4e18e0ae2"
   body:
     type: json
     data: ""

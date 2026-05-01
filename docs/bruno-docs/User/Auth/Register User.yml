@@ -5,14 +5,14 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/auth/register
+  url: "{{BASE_URL}}/auth/register"
   body:
     type: json
     data: |-
       {
-        "nama": "Budi Santoso",
+        "nama": "Budi Santoso Pendaftar",
         "jurusan": "Teknik Informatika",
-        "no_pengenal": "5025211001",
+        "no_pengenal": "5025211057",
         "no_telp": "081234567890",
         "role" : "mahasiswa",
         "password": "rahasia123",

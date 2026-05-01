@@ -24,6 +24,4 @@ type User struct {
 	TimParticipants      []TimParticipant `gorm:"foreignKey:UserID;references:UserID"`
 }
 
-// NRP            *string   `gorm:"column:nrp;unique"`
-// NIDN           *string   `gorm:"column:nidn;unique"`
-func (User) TableName() string { return "users" }
+

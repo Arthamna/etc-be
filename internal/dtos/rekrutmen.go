@@ -18,24 +18,26 @@ type RekrutmenResponse struct {
 	RekrutmenID    string    `json:"rekrutmen_id"`
 	UserID         string    `json:"user_id"`
 	Kegiatan       string    `json:"kegiatan"`
-	Kriteria       string    `json:"Kriteria" binding:"required"`
+	Kriteria       string    `json:"Kriteria"`
 	TanggalMulai   time.Time `json:"tanggal_mulai"`
 	TanggalSelesai time.Time `json:"tanggal_selesai"`
 	Fee            float64   `json:"fee"`
 	Role           string    `json:"role"`
 	ContactPerson  string    `json:"contact_person"`
+	TimID          string    `json:"tim_id,omitempty"`
 }
 
 type ApplierRekrutmenResponse struct {
 	RekrutmenID    string              `json:"rekrutmen_id"`
 	UserID         string              `json:"user_id"`
 	Kegiatan       string              `json:"kegiatan"`
-	Kriteria       string              `json:"Kriteria" binding:"required"`
+	Kriteria       string              `json:"Kriteria"`
 	TanggalMulai   time.Time           `json:"tanggal_mulai"`
 	TanggalSelesai time.Time           `json:"tanggal_selesai"`
 	Fee            float64             `json:"fee"`
 	Role           string              `json:"role"`
 	ContactPerson  string              `json:"contact_person"`
+	TimID          string              `json:"tim_id,omitempty"`
 	Pendaftar      []PendaftarResponse `json:"pendaftar"`
 }
 
@@ -49,8 +51,19 @@ type RekrutmenListResponse struct {
 
 type ApplyRequest struct {
 	AlasanMendaftar string `json:"alasan_mendaftar"`
-	CVURL           string `json:"cv_url"`
-	PortofolioURL   string `json:"portofolio_url"`
+	CVURL           string `json:"cv_url" binding:"required"`
+	PortofolioURL   string `json:"portofolio_url" binding:"required"`
+}
+
+type HistoryResponse struct {
+	ID             string    `json:"id"`
+	ReviewerUserID  string    `json:"reviewer_user_id"`
+	ReviewerName    string    `json:"reviewer_name"`
+	TimID           string    `json:"tim_id"`
+	TipeTim        string    `json:"tipe_tim"`
+	Rating          int64     `json:"rating"`
+	Deskripsi       string    `json:"deskripsi"`
+	CreatedAt       time.Time `json:"created_at"`
 }
 
 type PendaftarResponse struct {
@@ -62,6 +75,13 @@ type PendaftarResponse struct {
 	PortofolioURL   string  `json:"portofolio_url"`
 	Status          string  `json:"status"`
 	NamaPendaftar   string  `json:"nama_pendaftar"`
+	Histories       []HistoryResponse `json:"histories"`
+}
+
+type MyApplicationResponse struct {
+    PendaftarID string            `json:"pendaftar_id"`
+    Status      string            `json:"status"`
+    Rekrutmen   RekrutmenResponse `json:"rekrutmen"`
 }
 
 type TimMemberResponse struct {

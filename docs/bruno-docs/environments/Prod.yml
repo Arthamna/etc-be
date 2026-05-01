@@ -1,0 +1,4 @@
+name: Prod
+variables:
+  - name: BASE_URL
+    value: https://etc-backend-prod.gentlepebble-313cd90b.eastasia.azurecontainerapps.io

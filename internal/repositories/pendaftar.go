@@ -13,6 +13,7 @@ type PendaftarRepository interface {
     UpdateStatus(ctx context.Context, pendaftarID, status string) error
     UpdateStatusAccepted(ctx context.Context, rekrutmenID, pendaftarID, status string) error
     FindByRekrutmen(ctx context.Context, rekrutmenID string) (*[]models.Pendaftar, error)
+    FindByUserID(ctx context.Context, userID string) ([]models.Pendaftar, error)
 }
 
 type pendaftarRepository struct {
@@ -74,4 +75,16 @@ func (r *pendaftarRepository) UpdateStatusAccepted(ctx context.Context, rekrutme
 		Model(&models.Pendaftar{}).
 		Where("pendaftar_id = ? AND rekrutmen_id = ?", pendaftarID, rekrutmenID).
 		Update("status", status).Error
+}
+
+func (r *pendaftarRepository) FindByUserID(ctx context.Context, userID string) ([]models.Pendaftar, error) {
+    var pendaftar []models.Pendaftar
+    if err := r.db.WithContext(ctx).
+        Preload("Rekrutmen").
+        Preload("Rekrutmen.Tims").
+        Where("user_id = ?", userID).
+        Find(&pendaftar).Error; err != nil {
+        return nil, err
+    }
+    return pendaftar, nil
 }

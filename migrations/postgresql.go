@@ -54,10 +54,6 @@ func ConnectToPostgresql() *gorm.DB {
 }
 
 func AutoMigrateAll(db *gorm.DB) error {
-	// refresh table
-	// db.Migrator().DropConstraint(&models.Article{}, "fk_categories_articles")
-	// db.Migrator().DropConstraint(&models.Article{}, "fk_articles_author")
-	// db.Migrator().DropTable(&models.Category{}, &models.User{} , &models.Article{})
 
 	if err := db.AutoMigrate(
 		&models.User{},
