@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/tim/a37c5354-a144-4351-92f5-cb2598ea843b/members
+  url: "{{BASE_URL}}/api/tim/a37c5354-a144-4351-92f5-cb2598ea843b/members"
   auth:
     type: bearer
     token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzY0NjMxOCwiaWF0IjoxNzc3NjM5MTE4fQ.ntU9i81SnoX66eLa0QqzDzkGIjHofboKjNdkr69jEls

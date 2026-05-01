@@ -5,7 +5,7 @@ info:
 
 http:
   method: DELETE
-  url: http://localhost:8080/api/rekrutmen/15344251-ba55-447c-9c81-953a34835fcc
+  url: "{{BASE_URL}}/api/rekrutmen/15344251-ba55-447c-9c81-953a34835fcc"
   headers:
     - name: Authorization
       value: "{{token.mahasiswa1}}"

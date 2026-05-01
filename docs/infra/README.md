@@ -1,140 +1,92 @@
-Setup infra on Azure :
+# Setup infra on Azure
 
-# Requirements :
+## Requirements
 
-VS Code Package :
-
+### VS Code Package
 - Azure Tools
 
-
-OS :
+### OS
 - Azure CLI
 - Docker
 
-Azure :
-- Container Registry 
-
-
-
-Coba build image docker di local dulu to make sure this works
+### Azure
+- Container Registry
 
 ---
 
-Build local be :
+## Build image Docker local 
 
-pastikan main.go berada di folder sama dengan dockerfile
+### Backend
+Pastikan `main.go` berada di folder yang sama dengan `Dockerfile`.
 
+Jangan pakai `loadenv` on local
 
-jangan pakai loadenv local (?)
-
-setup supabase sudah, lewat transaction pooler
+Pastikan sudah setup database online.
 
 ```
 docker build -t etc-be:dev .
 docker run --rm -p 8080:8080 --env-file .env etc-be:dev
 ```
 
-docker_image ready lewat command
+### FrontEnd
+```
+docker build -t etc-fe:dev --build-arg NEXT_PUBLIC_API_URL={YOUR_API} .
+docker run --rm -p 3000:3000 etc-fe:dev
+```
+
+---
+
+## Setup ACR
+Follow tutorial ini: [here](https://www.youtube.com/watch?v=7FjPZia53BU&theme=dark)
+
+### Push Docker Image into ACR
+U can see it on Docker Desktop.
+```
+az login
+az acr login --name {name_acr} -g {name_resource_group}
+
+# tag each repo and push, example :
+    docker tag etc-be:dev etcimage.azurecr.io/etc-be:prod
+    docker push etcimage.azurecr.io/etc-be:prod
+
+    docker tag etc-fe:dev etcimage.azurecr.io/etc-fe:prod
+    docker push etcimage.azurecr.io/etc-fe:prod
+```
+
+---
+
+## Managed Identities
+Create first, then assign the user-assigned role for ACR pull.
+
+---
+
+## Setup Azure Container App
+- Make new container env if not exist (same region/location)
+- In Container, use ACR as image source, then select registry, image, and tag
+- Authentication type is managed identity
+- Set environment variable from secret, then input on container
+
+### Target Port
+- FE: `{YOUR_FE_PORT}`
+- BE: `{YOUR_BE_PORT}`
 
 ---
 
 
-Build local fe :
-
-
-
-```
-docker build -t etc-fe:dev --build-arg NEXT_PUBLIC_API_URL=http://localhost:8080 .
-docker run --rm -p 3000:3000 etc-fe:dev
-```
-
-Setup ACR
-
-Follow this [here](https://www.youtube.com/watch?v=7FjPZia53BU&theme=dark)
-
-
-Push Docker Image into ACR
-
-U can see it on docker desktop
-
-```
-az login
-az acr login --name etcimage -g DefaultResourceGroup-EA
-```
-
-
-```
-
-docker tag etc-be:dev etcimage.azurecr.io/etc-be
-
-docker push etcimage.azurecr.io/etc-be
-
-docker tag etc-fe:dev etcimage.azurecr.io/etc-fe
-
-docker push etcimage.azurecr.io/etc-fe
-```
-
-Managed Identities 
-Create first, then assign the user-assigned role for ACR pull
-
-
-```
-```
-
-Setup Azure container App
-
-Make new container env if not exist (same region/location)
-
-in Container, use ACR as image sources, then select registry, image, and tag
-
-authentication type is managed identity
-
-Set env variable from secret then input on container
-
-Target Port :
-fe : 3000
-be : 8080
-
-```
-
-```
-
-Urlnya sudah ada (di Application URL), tapi cara agar custom ??
-
-(beli domain dulu, but I don't have money for that)
-
-Azure DNS Public Zone
-
-Pertama, cari CNAME target, muncul di overview -> Application URL 
-
-So, sekarang setup pakai yang free aja
-
-
-setelah mendapatkan application url be, maka commandnya bisa disesuaikan :
+Setelah mendapatkan application URL BE, maka command FE bisa disesuaikan :
 
 ```
 docker build -t etc-fe:dev --build-arg NEXT_PUBLIC_API_URL={YOUR_APPLICATION_URL_BE} .
 docker run --rm -p 3000:3000 etc-fe:dev
 ```
 
-Anyway, pastikan mengganti tag setiap kali deployment agar sesuai 
+## Application URL
 
-buat be, jangan lupa nonaktifkan scan .env (di main) sebelum deploy
-```
+Akan muncul di overview tiap container, flow :
+Overview => Application Url
 
-docker tag etc-be:dev etcimage.azurecr.io/etc-be:prod1
+---
 
-docker push etcimage.azurecr.io/etc-be:prod1
-
-
-docker tag etc-fe:dev etcimage.azurecr.io/etc-fe:prod
-docker push etcimage.azurecr.io/etc-fe:prod
-```
-
-
-```
-
-
-```
-
-But how about proxy request ?
+## Notes
+- Pastikan mengganti tag setiap kali deployment agar sesuai.
+- Untuk BE, jangan lupa nonaktifkan scan `.env` di `main.go` sebelum deploy.

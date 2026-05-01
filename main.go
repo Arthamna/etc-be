@@ -22,9 +22,9 @@ import (
 
 func main() {
 	// disable in docker image
-	if err := loadEnv(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// if err := loadEnv(); err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
 
 	port := os.Getenv("PORT")
 	if port == "" {

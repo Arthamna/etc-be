@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/tim/a37c5354-a144-4351-92f5-cb2598ea843b/members/38bc4242-838f-4319-a5ae-b0d02b8585c4/rating
+  url: "{{BASE_URL}}/api/tim/a37c5354-a144-4351-92f5-cb2598ea843b/members/38bc4242-838f-4319-a5ae-b0d02b8585c4/rating"
   body:
     type: json
     data: |-
