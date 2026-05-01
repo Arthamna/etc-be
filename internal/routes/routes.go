@@ -46,8 +46,8 @@ func SetupRoutes(r *gin.Engine, userHandler handlers.UserHandler, rekrutmenHandl
 	// contoh : GET /rekrutmen?page=1&limit=10&kegiatan=riset&role=backend&q=java
 	r.GET("/api/rekrutmen", rekrutmenHandler.GetAll)
 	// .GET("/sort/type/:type", rekrutmenHandler.GetByType)
-	r.GET("/sort/type/:type", rekrutmenHandler.GetByType)
-	r.GET("/sort/role/:role", rekrutmenHandler.GetByRole)
+	r.GET("/api/rekrutmen/sort/type/:type", rekrutmenHandler.GetByType)
+	r.GET("/api/rekrutmen/sort/role/:role", rekrutmenHandler.GetByRole)
 
 	api := r.Group("/api")
 	api.Use(middleware.AuthMiddleware())
