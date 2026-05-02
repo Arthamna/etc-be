@@ -1,11 +1,11 @@
 info:
-  name: Get Me
+  name: Get Bookmark
   type: http
-  seq: 3
+  seq: 6
 
 http:
   method: GET
-  url: "{{BASE_URL}}/auth/me"
+  url: "{{BASE_URL}}/auth/bookmarks"
   auth:
     type: bearer
     token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzQ5MjI1MiwiaWF0IjoxNzc3NDg1MDUyfQ.fbemCnoQyOiOiz_OSRhJUMgz-r5J_1pP6Ezr1IEWVLs
@@ -19,7 +19,7 @@ settings:
 examples:
   - name: Success
     request:
-      url: http://localhost:8080/auth/me
+      url: http://localhost:8080/auth/bookmarks
       method: GET
     response:
       status: 200
@@ -36,25 +36,26 @@ examples:
         - name: content-type
           value: application/json; charset=utf-8
         - name: date
-          value: Wed, 29 Apr 2026 17:54:42 GMT
+          value: Wed, 29 Apr 2026 18:28:15 GMT
         - name: content-length
-          value: "342"
+          value: "422"
       body:
         type: json
         data: |-
-          {
-            "personal_info": {
-              "user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
-              "nama": "Budi Santoso",
-              "Jurusan": "Teknik Informatika",
-              "no_pengenal": "5025211001",
-              "no_telepon": "081234567890",
-              "role": "mahasiswa",
-              "profile_picture": "https://drive.google.com/file/d/1uStLESBS7LA_duEjhyUzKozjUSyxuDTl/view",
-              "spesialisasi": [
-                "AI",
-                "Machine Learning",
-                "Data Science"
-              ]
+          [
+            {
+              "id": "ab3c7dab-9d08-489d-8dac-2bd69896cd94",
+              "rekrutmen_id": "5db1e7b7-16c2-4876-bea6-f180c60f274c",
+              "rekrutmen": {
+                "rekrutmen_id": "5db1e7b7-16c2-4876-bea6-f180c60f274c",
+                "user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
+                "kegiatan": "projek",
+                "Kriteria": "Menguasai REST API",
+                "tanggal_mulai": "2026-05-01T00:00:00Z",
+                "tanggal_selesai": "2026-05-31T00:00:00Z",
+                "fee": 1500000,
+                "role": "software engineer",
+                "contact_person": "08123456789"
+              }
             }
-          }
+          ]

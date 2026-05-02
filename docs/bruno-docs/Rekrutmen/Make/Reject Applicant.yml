@@ -1,19 +1,14 @@
 info:
-  name: Login
+  name: Reject Applicant
   type: http
-  seq: 1
+  seq: 8
 
 http:
-  method: POST
-  url: "{{BASE_URL}}/auth/login"
-  body:
-    type: json
-    data: |-
-      {
-        "no_pengenal": "5025211001",
-        "password": "rahasia123"
-      }
-  auth: inherit
+  method: PATCH
+  url: "{{BASE_URL}}/api/rekrutmen/5db1e7b7-16c2-4876-bea6-f180c60f274c/apply/934da4cc-897f-4fc9-9dc2-06decb5d834c/reject"
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzY0NjMxOCwiaWF0IjoxNzc3NjM5MTE4fQ.ntU9i81SnoX66eLa0QqzDzkGIjHofboKjNdkr69jEls
 
 settings:
   encodeUrl: true
@@ -24,15 +19,8 @@ settings:
 examples:
   - name: Success
     request:
-      url: http://localhost:8080/auth/login
-      method: POST
-      body:
-        type: json
-        data: |-
-          {
-            "no_pengenal": "5025211001",
-            "password": "rahasia123"
-          }
+      url: http://localhost:8080/api/rekrutmen/5db1e7b7-16c2-4876-bea6-f180c60f274c/apply/934da4cc-897f-4fc9-9dc2-06decb5d834c/reject
+      method: PATCH
     response:
       status: 200
       statusText: OK
@@ -48,13 +36,12 @@ examples:
         - name: content-type
           value: application/json; charset=utf-8
         - name: date
-          value: Wed, 29 Apr 2026 17:50:52 GMT
+          value: Fri, 01 May 2026 13:14:17 GMT
         - name: content-length
-          value: "274"
+          value: "63"
       body:
         type: json
         data: |-
           {
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzQ5MjI1MiwiaWF0IjoxNzc3NDg1MDUyfQ.fbemCnoQyOiOiz_OSRhJUMgz-r5J_1pP6Ezr1IEWVLs",
-            "role": "mahasiswa"
+            "message": "status pendaftar berhasil diubah menjadi rejected"
           }

@@ -18,14 +18,18 @@ import (
 type RekrutmenService interface {
 	Create(ctx context.Context, userID string, req dtos.CreateRekrutmenRequest) (*dtos.RekrutmenResponse, error)
 	GetAll(ctx context.Context, page, limit int, kegiatan, role, keyword string) (*dtos.RekrutmenListResponse, error)
-	GetByID(ctx context.Context, id string) (*dtos.RekrutmenResponse, error)
+    GetByID(ctx context.Context, id string) (*dtos.RekrutmenResponse, error)
+	GetAppliedByID(ctx context.Context, id string, userID string) (*dtos.ApplierRekrutmenResponse, error)
 	GetByUserID(ctx context.Context, userID string) ([]dtos.RekrutmenResponse, error)
 	Update(ctx context.Context, userID, rekrutmenID string, req dtos.CreateRekrutmenRequest) (*dtos.RekrutmenResponse, error)
 	Delete(ctx context.Context, userID, rekrutmenID string) error
 	Apply(ctx context.Context, userID, rekrutmenID string, req dtos.ApplyRequest) (*dtos.PendaftarResponse, error)
 	UploadCV(ctx context.Context, userID, rekrutmenID string, file *multipart.FileHeader) (*dtos.UploadFileResponse, error)
 	UploadPortfolio(ctx context.Context, userID, rekrutmenID string, file *multipart.FileHeader) (*dtos.UploadFileResponse, error)
-	UpdateApplyStatus(ctx context.Context, rekrutmenID, pendaftarID, status string) error
+    AcceptPendaftar(ctx context.Context, userID, rekrutmenID, pendaftarID string) error
+    RejectPendaftar(ctx context.Context, userID, rekrutmenID, pendaftarID string) error
+	RefreshApplyStatus(ctx context.Context, rekrutmenID, pendaftarID, status string) error
+	GetAppliedRekrutmen(ctx context.Context, userID string) ([]dtos.MyApplicationResponse, error)
 	GetApplicantDetail(ctx context.Context, rekrutmenID, pendaftarID string) (*dtos.PendaftarResponse, error)
 	GetTeamMembers(ctx context.Context, timID string) ([]dtos.TimMemberResponse, error)
 	GiveMemberRating(ctx context.Context, reviewerID, timID, targetUserID string, rating int64, deskripsi string) error
@@ -58,12 +62,12 @@ func NewRekrutmenService(
 func (s *rekrutmenService) Create(ctx context.Context, userID string, req dtos.CreateRekrutmenRequest) (*dtos.RekrutmenResponse, error) {
 	rekrutmen := &models.Rekrutmen{
 		RekrutmenID:    uuid.NewString(),
-		KegiatanID:     uuid.NewString(),
 		UserID:         userID,
 		Kegiatan:       req.Kegiatan,
+        Kriteria:       req.Kriteria,
 		TanggalMulai:   req.TanggalMulai,
 		TanggalSelesai: req.TanggalSelesai,
-		Fee:            req.Fee,
+		Fee:            &req.Fee,
 		Role:           req.Role,
 		ContactPerson:  req.ContactPerson,
 	}
@@ -78,8 +82,44 @@ func (s *rekrutmenService) Create(ctx context.Context, userID string, req dtos.C
 		return nil, err
 	}
 
-	res := dtos.ToRekrutmenResponse(created)
+	res := dtos.RekrutmenResponse{
+        RekrutmenID:    created.RekrutmenID,
+        UserID:         created.UserID,
+        Kegiatan:       created.Kegiatan,
+        Kriteria:       created.Kriteria,
+        TanggalMulai:   created.TanggalMulai,
+        TanggalSelesai: created.TanggalSelesai,
+        Fee:            *created.Fee,
+        Role:           created.Role,
+        ContactPerson:  created.ContactPerson,
+    }
 	return &res, nil
+}
+
+func (s *rekrutmenService) GetByID(ctx context.Context, id string) (*dtos.RekrutmenResponse, error) {
+    data, err := s.rekrutmenRepo.FindByID(ctx, id)
+    if err != nil {
+        return nil, err
+    }
+
+    timID := ""
+    if len(data.Tims) > 0 {
+        timID = data.Tims[0].TimID
+    }
+
+    res := dtos.RekrutmenResponse{
+        RekrutmenID:    data.RekrutmenID,
+        UserID:         data.UserID,
+        Kegiatan:       data.Kegiatan,
+        Kriteria:       data.Kriteria,
+        TanggalMulai:   data.TanggalMulai,
+        TanggalSelesai: data.TanggalSelesai,
+        Fee:            *data.Fee,
+        Role:           data.Role,
+        ContactPerson:  data.ContactPerson,
+        TimID:          timID,
+    }
+    return &res, nil
 }
 
 func (s *rekrutmenService) GetAll(ctx context.Context, page, limit int, kegiatan, role, keyword string) (*dtos.RekrutmenListResponse, error) {
@@ -97,7 +137,22 @@ func (s *rekrutmenService) GetAll(ctx context.Context, page, limit int, kegiatan
 
 	var responses []dtos.RekrutmenResponse
 	for _, r := range data {
-		responses = append(responses, dtos.ToRekrutmenResponse(&r))
+        timID := ""
+        if len(r.Tims) > 0 {
+            timID = r.Tims[0].TimID
+        }
+        responses = append(responses, dtos.RekrutmenResponse{
+            RekrutmenID:    r.RekrutmenID,
+            UserID:         r.UserID,
+            Kegiatan:       r.Kegiatan,
+            Kriteria:       r.Kriteria,
+            TanggalMulai:   r.TanggalMulai,
+            TanggalSelesai: r.TanggalSelesai,
+            Fee:            *r.Fee,
+            Role:           r.Role,
+            ContactPerson:  r.ContactPerson,
+            TimID:          timID,
+        })
 	}
 
 	return &dtos.RekrutmenListResponse{
@@ -109,13 +164,51 @@ func (s *rekrutmenService) GetAll(ctx context.Context, page, limit int, kegiatan
 	}, nil
 }
 
-func (s *rekrutmenService) GetByID(ctx context.Context, id string) (*dtos.RekrutmenResponse, error) {
+func (s *rekrutmenService) GetAppliedByID(ctx context.Context, id string, userID string) (*dtos.ApplierRekrutmenResponse, error) {
 	rekrutmen, err := s.rekrutmenRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, errors.New("rekrutmen not found")
 	}
-	res := dtos.ToRekrutmenResponse(rekrutmen)
-	return &res, nil
+
+    if rekrutmen.UserID != userID {
+        return nil, errors.New("tidak memiliki akses")
+    }
+
+    pendaftar, err := s.pendaftarRepo.FindByRekrutmen(ctx, id)
+    if err != nil {
+        return nil, err
+    }
+
+    timID := ""
+    if len(rekrutmen.Tims) > 0 {
+        timID = rekrutmen.Tims[0].TimID
+    }
+
+    res := dtos.ApplierRekrutmenResponse{
+        RekrutmenID:    rekrutmen.RekrutmenID,
+        UserID:         rekrutmen.UserID,
+        Kegiatan:       rekrutmen.Kegiatan,
+        Kriteria:       rekrutmen.Kriteria,
+        TanggalMulai:   rekrutmen.TanggalMulai,
+        TanggalSelesai: rekrutmen.TanggalSelesai,
+        Fee:            *rekrutmen.Fee,
+        Role:           rekrutmen.Role,
+        ContactPerson:  rekrutmen.ContactPerson,
+        TimID:          timID,
+    }
+    for _, p := range *pendaftar {
+        res.Pendaftar = append(res.Pendaftar, dtos.PendaftarResponse{
+            PendaftarID:     p.PendaftarID,
+            RekrutmenID:     p.RekrutmenID,
+            UserID:          p.UserID,
+            AlasanMendaftar: p.AlasanMendaftar,
+            CVURL:           p.CVURL,
+            PortofolioURL:   p.PortofolioURL,
+            Status:          p.Status,
+            NamaPendaftar:   p.User.Nama,
+        })
+    }
+    return &res, nil
 }
 
 func (s *rekrutmenService) GetByUserID(ctx context.Context, userID string) ([]dtos.RekrutmenResponse, error) {
@@ -126,7 +219,22 @@ func (s *rekrutmenService) GetByUserID(ctx context.Context, userID string) ([]dt
 
 	var responses []dtos.RekrutmenResponse
 	for _, r := range data {
-		responses = append(responses, dtos.ToRekrutmenResponse(&r))
+        timID := ""
+        if len(r.Tims) > 0 {
+            timID = r.Tims[0].TimID
+        }
+		responses = append(responses, dtos.RekrutmenResponse{
+            RekrutmenID:    r.RekrutmenID,
+            UserID:         r.UserID,
+            Kegiatan:       r.Kegiatan,
+            Kriteria:       r.Kriteria,
+            TanggalMulai:   r.TanggalMulai,
+            TanggalSelesai: r.TanggalSelesai,
+            Fee:            *r.Fee,
+            Role:           r.Role,
+            ContactPerson:  r.ContactPerson,
+            TimID:          timID,
+        })
 	}
 	return responses, nil
 }
@@ -141,12 +249,24 @@ func (s *rekrutmenService) Update(ctx context.Context, userID, rekrutmenID strin
 		return nil, errors.New("tidak memiliki akses")
 	}
 
-	rekrutmen.Kegiatan = req.Kegiatan
-	rekrutmen.TanggalMulai = req.TanggalMulai
-	rekrutmen.TanggalSelesai = req.TanggalSelesai
-	rekrutmen.Fee = req.Fee
-	rekrutmen.Role = req.Role
-	rekrutmen.ContactPerson = req.ContactPerson
+    if req.Kegiatan != "" {
+        rekrutmen.Kegiatan = req.Kegiatan
+    }
+    if !req.TanggalMulai.IsZero() {
+        rekrutmen.TanggalMulai = req.TanggalMulai
+    }
+    if !req.TanggalSelesai.IsZero() {
+        rekrutmen.TanggalSelesai = req.TanggalSelesai
+    }
+    if req.Fee != 0 {
+        rekrutmen.Fee = &req.Fee
+    }
+    if req.Role != "" {
+        rekrutmen.Role = req.Role
+    }
+    if req.ContactPerson != "" {
+        rekrutmen.ContactPerson = req.ContactPerson
+    }
 
 	updated, err := s.rekrutmenRepo.Update(ctx, rekrutmen)
 	if err != nil {
@@ -158,7 +278,17 @@ func (s *rekrutmenService) Update(ctx context.Context, userID, rekrutmenID strin
 		return nil, err
 	}
 
-	res := dtos.ToRekrutmenResponse(updated)
+	res := dtos.RekrutmenResponse{
+        RekrutmenID:    rekrutmen.RekrutmenID,
+        UserID:         rekrutmen.UserID,
+        Kegiatan:       rekrutmen.Kegiatan,
+        Kriteria:       rekrutmen.Kriteria,
+        TanggalMulai:   rekrutmen.TanggalMulai,
+        TanggalSelesai: rekrutmen.TanggalSelesai,
+        Fee:            *rekrutmen.Fee,
+        Role:           rekrutmen.Role,
+        ContactPerson:  rekrutmen.ContactPerson,
+    }
 	return &res, nil
 }
 
@@ -234,48 +364,111 @@ func (s *rekrutmenService) UploadPortfolio(ctx context.Context, userID, rekrutme
     return &dtos.UploadFileResponse{URL: link}, nil
 }
 
-func (s *rekrutmenService) UpdateApplyStatus(ctx context.Context, rekrutmenID, pendaftarID, status string) error {
-    pendaftar, err := s.pendaftarRepo.FindByID(ctx, pendaftarID)
-    if err != nil {
-        return errors.New("pendaftar tidak ditemukan")
-    }
+func (s *rekrutmenService) RefreshApplyStatus(ctx context.Context, rekrutmenID, pendaftarID, status string) error {
+	pendaftar, err := s.pendaftarRepo.FindByID(ctx, pendaftarID)
+	if err != nil {
+		return errors.New("pendaftar tidak ditemukan")
+	}
 
-    if pendaftar.RekrutmenID != rekrutmenID {
-        return errors.New("pendaftar tidak sesuai dengan rekrutmen")
-    }
+	if pendaftar.RekrutmenID != rekrutmenID {
+		return errors.New("pendaftar tidak sesuai dengan rekrutmen")
+	}
 
-    if status == constants.STATUS_APPROVED {
-        tim, err := s.timRepo.FindByRekrutmenID(ctx, rekrutmenID)
-        if err != nil {
-            rekrutmen, err := s.rekrutmenRepo.FindByID(ctx, rekrutmenID)
+	return s.handleStatusUpdate(ctx, rekrutmenID, pendaftarID, pendaftar.UserID, status)
+}
+
+func (s *rekrutmenService) AcceptPendaftar(ctx context.Context, userID, rekrutmenID, pendaftarID string) error {
+	ok, err := s.rekrutmenRepo.IsOwnedByUser(ctx, rekrutmenID, userID)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return errors.New("rekrutmen bukan milik user ini")
+	}
+
+	pendaftar, err := s.pendaftarRepo.FindByID(ctx, pendaftarID)
+	if err != nil {
+		return errors.New("pendaftar tidak ditemukan")
+	}
+
+	return s.handleStatusUpdate(ctx, rekrutmenID, pendaftarID, pendaftar.UserID, constants.STATUS_APPROVED)
+}
+
+func (s *rekrutmenService) RejectPendaftar(ctx context.Context, userID, rekrutmenID, pendaftarID string) error {
+	ok, err := s.rekrutmenRepo.IsOwnedByUser(ctx, rekrutmenID, userID)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return errors.New("rekrutmen bukan milik user ini")
+	}
+
+	pendaftar, err := s.pendaftarRepo.FindByID(ctx, pendaftarID)
+	if err != nil {
+		return errors.New("pendaftar tidak ditemukan")
+	}
+
+	return s.handleStatusUpdate(ctx, rekrutmenID, pendaftarID, pendaftar.UserID, constants.STATUS_REJECTED)
+}
+
+func (s *rekrutmenService) handleStatusUpdate(ctx context.Context, rekrutmenID, pendaftarID, applicantUserID, status string) error {
+    
+    switch status {
+        case constants.STATUS_APPROVED:
+            tim, err := s.timRepo.FindByRekrutmenID(ctx, rekrutmenID)
+            if err != nil {
+                rekrutmen, err := s.rekrutmenRepo.FindByID(ctx, rekrutmenID)
+                if err != nil {
+                    return err
+                }
+                tim = &models.Tim{
+                    TimID:       uuid.NewString(),
+                    TipeTim:     rekrutmen.Kegiatan,
+                    RekrutmenID: rekrutmenID,
+                    // NamaKetua:   rekrutmen.User.Nama,
+                    CreatedAt:   time.Now(),
+                }
+                if err := s.timRepo.Create(ctx, tim); err != nil {
+                    return err
+                }
+            }
+
+            // Check if already a participant to avoid duplicates
+            isMember, err := s.timRepo.IsParticipant(ctx, tim.TimID, applicantUserID)
             if err != nil {
                 return err
             }
-            tim = &models.Tim{
-                TimID:       uuid.NewString(),
-                TipeTim:     rekrutmen.Kegiatan,
-                RekrutmenID: rekrutmenID,
-                NamaKetua:   rekrutmen.User.Nama,
-                CreatedAt:   time.Now(),
-            }
-            if err := s.timRepo.Create(ctx, tim); err != nil {
-                return err
-            }
-        }
 
-        count, _ := s.timRepo.CountParticipants(ctx, tim.TimID)
-        participant := &models.TimParticipant{
-            ID:       uuid.NewString(),
-            TimID:    tim.TimID,
-            UserID:   pendaftar.UserID,
-            MemberKe: count + 1,
-        }
-        if err := s.timRepo.AddParticipant(ctx, participant); err != nil {
-            return err
-        }
+            // put into tim_participant
+            if !isMember {
+                count, err := s.timRepo.CountParticipants(ctx, tim.TimID)
+                if err != nil {
+                    return err
+                }
+                participant := &models.TimParticipant{
+                    ID:       uuid.NewString(),
+                    TimID:    tim.TimID,
+                    UserID:   applicantUserID,
+                    MemberKe: count + 1,
+                }
+                if err := s.timRepo.AddParticipant(ctx, participant); err != nil {
+                    return err
+                }
+            }
+
+        case constants.STATUS_REJECTED:
+            // If rejected, remove from team if they were previously added
+            tim, err := s.timRepo.FindByRekrutmenID(ctx, rekrutmenID)
+            if err == nil && tim != nil {
+                if err := s.timRepo.RemoveParticipant(ctx, tim.TimID, applicantUserID); err != nil {
+                    return err
+                }
+            }
+        default:
+            return errors.New("status tidak valid")
     }
 
-    return s.pendaftarRepo.UpdateStatus(ctx, pendaftarID, status)
+	return s.pendaftarRepo.UpdateStatus(ctx, pendaftarID, status)
 }
 
 func (s *rekrutmenService) GetApplicantDetail(ctx context.Context, rekrutmenID, pendaftarID string) (*dtos.PendaftarResponse, error) {
@@ -284,44 +477,115 @@ func (s *rekrutmenService) GetApplicantDetail(ctx context.Context, rekrutmenID, 
         return nil, errors.New("pendaftar tidak ditemukan")
     }
 
-    return &dtos.PendaftarResponse{
-        PendaftarID:     pendaftar.PendaftarID,
-        RekrutmenID:     pendaftar.RekrutmenID,
-        UserID:          pendaftar.UserID,
-        AlasanMendaftar: pendaftar.AlasanMendaftar,
-        CVURL:           pendaftar.CVURL,
-        PortofolioURL:   pendaftar.PortofolioURL,
-        Status:          pendaftar.Status,
-        NamaPendaftar:   pendaftar.User.Nama,
-    }, nil
+	if pendaftar.RekrutmenID != rekrutmenID {
+		return nil, errors.New("pendaftar tidak ditemukan")
+	}
+
+	histories, err := s.historyRepo.FindByUserID(ctx, pendaftar.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	historyResponses := make([]dtos.HistoryResponse, 0, len(histories))
+	for _, h := range histories {
+		historyResponses = append(historyResponses, dtos.HistoryResponse{
+			ID:            h.ID,
+			ReviewerUserID: h.ReviewerUserID,
+			ReviewerName:   h.Reviewer.Nama,
+			TimID:          h.TimID,
+			TipeTim:        h.Tim.TipeTim,
+			Rating:         h.Rating,
+			Deskripsi:      h.Deskripsi,
+			CreatedAt:      h.CreatedAt,
+		})
+	}
+
+	return &dtos.PendaftarResponse{
+		PendaftarID:     pendaftar.PendaftarID,
+		RekrutmenID:     pendaftar.RekrutmenID,
+		UserID:          pendaftar.UserID,
+		AlasanMendaftar: pendaftar.AlasanMendaftar,
+		CVURL:           pendaftar.CVURL,
+		PortofolioURL:   pendaftar.PortofolioURL,
+		Status:          pendaftar.Status,
+		NamaPendaftar:   pendaftar.User.Nama,
+		Histories:       historyResponses,
+	}, nil
 }
 
-func (s *rekrutmenService) GetTeamMembers(ctx context.Context, timID string) ([]dtos.TimMemberResponse, error) {
-    tim, err := s.timRepo.FindByID(ctx, timID)
+func (s *rekrutmenService) GetAppliedRekrutmen(ctx context.Context, userID string) ([]dtos.MyApplicationResponse, error) {
+    data, err := s.pendaftarRepo.FindByUserID(ctx, userID)
     if err != nil {
-        return nil, errors.New("tim tidak ditemukan")
+        return nil, err
     }
 
-    var responses []dtos.TimMemberResponse
-    for _, p := range tim.Participants {
-        jurusan := ""
-        if p.User.Jurusan != nil {
-            jurusan = *p.User.Jurusan
+    var responses []dtos.MyApplicationResponse
+    for _, p := range data {
+        timID := ""
+        if p.Status == constants.STATUS_APPROVED && len(p.Rekrutmen.Tims) > 0 {
+            timID = p.Rekrutmen.Tims[0].TimID
         }
-        responses = append(responses, dtos.TimMemberResponse{
-            UserID:   p.UserID,
-            Nama:     p.User.Nama,
-            Jurusan:  jurusan,
-            MemberKe: p.MemberKe,
+
+        fee := 0.0
+        if p.Rekrutmen.Fee != nil {
+            fee = *p.Rekrutmen.Fee
+        }
+
+        responses = append(responses, dtos.MyApplicationResponse{
+            PendaftarID: p.PendaftarID,
+            Status:      p.Status,
+            Rekrutmen: dtos.RekrutmenResponse{
+                RekrutmenID:    p.Rekrutmen.RekrutmenID,
+                UserID:         p.Rekrutmen.UserID,
+                Kegiatan:       p.Rekrutmen.Kegiatan,
+                Kriteria:       p.Rekrutmen.Kriteria,
+                TanggalMulai:   p.Rekrutmen.TanggalMulai,
+                TanggalSelesai: p.Rekrutmen.TanggalSelesai,
+                Fee:            fee,
+                Role:           p.Rekrutmen.Role,
+                ContactPerson:  p.Rekrutmen.ContactPerson,
+                TimID:          timID,
+            },
         })
     }
     return responses, nil
+}
+
+func (s *rekrutmenService) GetTeamMembers(ctx context.Context, timID string) ([]dtos.TimMemberResponse, error) {
+	tim, err := s.timRepo.FindByID(ctx, timID)
+	if err != nil {
+		return nil, errors.New("tim tidak ditemukan")
+	}
+
+	var responses []dtos.TimMemberResponse
+	for _, p := range tim.Participants {
+		jurusan := ""
+		if p.User.Jurusan != nil {
+			jurusan = *p.User.Jurusan
+		}
+
+		responses = append(responses, dtos.TimMemberResponse{
+			UserID:       p.UserID,
+			Nama:         p.User.Nama,
+			Jurusan:      jurusan,
+			MemberKe:     p.MemberKe,
+			NoPengenal:   p.User.NoPengenal,
+			NoTelp:       p.User.NoTelp,
+			Spesialisasi: p.User.Spesialisasi,
+		})
+	}
+	return responses, nil
 }
 
 func (s *rekrutmenService) GiveMemberRating(ctx context.Context, reviewerID, timID, targetUserID string, rating int64, deskripsi string) error {
     existing, _ := s.historyRepo.FindByReviewerAndUserAndTim(ctx, reviewerID, targetUserID, timID)
     if existing != nil {
         return errors.New("sudah memberikan rating ke user ini")
+    }
+
+    Tim, _ := s.timRepo.FindByID(ctx, timID)
+    if Tim == nil {
+        return errors.New("tim tidak ditemukan")
     }
 
     history := &models.History{

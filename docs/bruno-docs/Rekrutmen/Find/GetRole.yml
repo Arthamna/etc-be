@@ -1,0 +1,63 @@
+info:
+  name: GetRole
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{BASE_URL}}/api/rekrutmen/sort/role/ui"
+  auth:
+    type: bearer
+    token: ""
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: "{{BASE_URL}}/api/rekrutmen/sort/role/ui"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With
+        - name: access-control-allow-methods
+          value: POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE
+        - name: access-control-allow-origin
+          value: "*"
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Fri, 01 May 2026 13:32:23 GMT
+        - name: content-length
+          value: "355"
+      body:
+        type: json
+        data: |-
+          {
+            "data": [
+              {
+                "rekrutmen_id": "ab87fe23-afb1-4b38-ade3-c1015de56a3e",
+                "user_id": "2e98bc24-1705-423f-8da9-97f7537fbff5",
+                "kegiatan": "projek",
+                "Kriteria": "lorem ipsum",
+                "tanggal_mulai": "2026-05-01T00:00:00Z",
+                "tanggal_selesai": "2026-06-05T00:00:00Z",
+                "fee": 500000000,
+                "role": "ui ux",
+                "contact_person": "085850362877"
+              }
+            ],
+            "page": 1,
+            "limit": 10,
+            "total_items": 1,
+            "total_pages": 1
+          }

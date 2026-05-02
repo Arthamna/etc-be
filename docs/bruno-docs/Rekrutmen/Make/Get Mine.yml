@@ -1,11 +1,14 @@
 info:
-  name: Get Me
+  name: Get Mine
   type: http
   seq: 3
 
 http:
   method: GET
-  url: "{{BASE_URL}}/auth/me"
+  url: "{{BASE_URL}}/api/rekrutmen/mine"
+  body:
+    type: json
+    data: ""
   auth:
     type: bearer
     token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzQ5MjI1MiwiaWF0IjoxNzc3NDg1MDUyfQ.fbemCnoQyOiOiz_OSRhJUMgz-r5J_1pP6Ezr1IEWVLs
@@ -19,8 +22,11 @@ settings:
 examples:
   - name: Success
     request:
-      url: http://localhost:8080/auth/me
+      url: http://localhost:8080/api/rekrutmen/mine
       method: GET
+      body:
+        type: json
+        data: ""
     response:
       status: 200
       statusText: OK
@@ -36,25 +42,33 @@ examples:
         - name: content-type
           value: application/json; charset=utf-8
         - name: date
-          value: Wed, 29 Apr 2026 17:54:42 GMT
+          value: Wed, 29 Apr 2026 18:32:21 GMT
         - name: content-length
-          value: "342"
+          value: "601"
       body:
         type: json
         data: |-
-          {
-            "personal_info": {
+          [
+            {
+              "rekrutmen_id": "b949be2a-55c0-476e-b34e-f2d4e18e0ae2",
               "user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
-              "nama": "Budi Santoso",
-              "Jurusan": "Teknik Informatika",
-              "no_pengenal": "5025211001",
-              "no_telepon": "081234567890",
-              "role": "mahasiswa",
-              "profile_picture": "https://drive.google.com/file/d/1uStLESBS7LA_duEjhyUzKozjUSyxuDTl/view",
-              "spesialisasi": [
-                "AI",
-                "Machine Learning",
-                "Data Science"
-              ]
+              "kegiatan": "projek",
+              "Kriteria": "",
+              "tanggal_mulai": "2026-05-01T00:00:00Z",
+              "tanggal_selesai": "2026-05-31T00:00:00Z",
+              "fee": 1500000,
+              "role": "software engineer",
+              "contact_person": "08123456789"
+            },
+            {
+              "rekrutmen_id": "5db1e7b7-16c2-4876-bea6-f180c60f274c",
+              "user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
+              "kegiatan": "projek",
+              "Kriteria": "Menguasai REST API",
+              "tanggal_mulai": "2026-05-01T00:00:00Z",
+              "tanggal_selesai": "2026-05-31T00:00:00Z",
+              "fee": 1500000,
+              "role": "software engineer",
+              "contact_person": "08123456789"
             }
-          }
+          ]

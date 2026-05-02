@@ -1,0 +1,106 @@
+info:
+  name: Apply Rekrutmen
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/api/rekrutmen/5db1e7b7-16c2-4876-bea6-f180c60f274c/apply"
+  body:
+    type: json
+    data: |-
+      {
+        "alasan_mendaftar": "saya sudah mempunyai pengalaman yang cukup banyak menggukana wordpress, dan saya sangat tertarik dalam menggunakan wordpress.",
+          "cv_url" : "https://drive.google.com/file/d/159nA-72S7ppRUXOHU0GGBiX6gyL6CRz-/view",
+        "portofolio_url" : "https://drive.google.com/file/d/1rfHpo9wmVDLWoM1jD-QMjHTwXj4PObeM/view"
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMzhiYzQyNDItODM4Zi00MzE5LWE1YWUtYjBkMDJiODU4NWM0Iiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzY0NzY1NCwiaWF0IjoxNzc3NjQwNDU0fQ.CVyDthl9CMqQ7jTHTg1fRzxhDge2kd0DuZbfGk88S2w
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: http://localhost:8080/api/rekrutmen/ff62ebbc-826e-45aa-b06f-1fda65f4a661/apply
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "alasan_mendaftar": "saya sudah mempunyai pengalaman yang cukup banyak menggukana wordpress, dan saya sangat tertarik dalam menggunakan wordpress.",
+            "cv_url" : "https://drive.google.com/file/d/159nA-72S7ppRUXOHU0GGBiX6gyL6CRz-/view",
+            "portofolio_url" : "https://drive.google.com/file/d/1rfHpo9wmVDLWoM1jD-QMjHTwXj4PObeM/view"
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With
+        - name: access-control-allow-methods
+          value: POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE
+        - name: access-control-allow-origin
+          value: "*"
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Fri, 01 May 2026 12:26:53 GMT
+        - name: content-length
+          value: "533"
+      body:
+        type: json
+        data: |-
+          {
+            "pendaftar_id": "64f1e9ce-e47b-43b2-8d31-9b434a453ac5",
+            "rekrutmen_id": "ff62ebbc-826e-45aa-b06f-1fda65f4a661",
+            "user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
+            "alasan_mendaftar": "saya sudah mempunyai pengalaman yang cukup banyak menggukana wordpress, dan saya sangat tertarik dalam menggunakan wordpress.",
+            "cv_url": "https://drive.google.com/file/d/159nA-72S7ppRUXOHU0GGBiX6gyL6CRz-/view",
+            "portofolio_url": "https://drive.google.com/file/d/1rfHpo9wmVDLWoM1jD-QMjHTwXj4PObeM/view",
+            "status": "pending",
+            "nama_pendaftar": "Budi Santoso Test"
+          }
+  - name: Error Already Register
+    request:
+      url: http://localhost:8080/api/rekrutmen/90c2546c-f03e-42ba-b542-e66de6e922d1/apply
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "alasan_mendaftar": "saya sudah mempunyai pengalaman yang cukup banyak menggukana wordpress, dan saya sangat tertarik dalam menggunakan wordpress.",
+              "cv_url" : "https://drive.google.com/file/d/159nA-72S7ppRUXOHU0GGBiX6gyL6CRz-/view",
+            "portofolio_url" : "https://drive.google.com/file/d/1rfHpo9wmVDLWoM1jD-QMjHTwXj4PObeM/view"
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With
+        - name: access-control-allow-methods
+          value: POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE
+        - name: access-control-allow-origin
+          value: "*"
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Fri, 01 May 2026 12:39:09 GMT
+        - name: content-length
+          value: "44"
+      body:
+        type: json
+        data: |-
+          {
+            "error": "sudah mendaftar ke rekrutmen ini"
+          }

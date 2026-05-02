@@ -14,12 +14,12 @@ type UserRegisterRequest struct {
 	Role         string   `json:"role" binding:"required,oneof=mahasiswa dosen"`
 	Password     string   `json:"password" binding:"required,min=6"`
 	NoTelp       string   `json:"no_telp" binding:"required"`
-	NoPengenal   string   `json:"no_pengenal"`
-	Spesialisasi []string `json:"spesialisasi"`
+	NoPengenal   string   `json:"no_pengenal" binding:"required"`
+	Spesialisasi []string `json:"spesialisasi" binding:"required"`
 }
 
 type UserLoginRequest struct {
-	NoPengenal string `json:"no_pengenal"`
+	NoPengenal string `json:"no_pengenal" binding:"required"`
 	Password   string `json:"password" binding:"required"`
 }
 
@@ -29,8 +29,8 @@ type UserRegisterResponse struct {
 }
 
 type UserLoginResponse struct {
-	Token string `json:"token"`
-	Role  string `json:"role"`
+	Token string `json:"token" binding:"required"`
+	Role  string `json:"role" binding:"required"`
 }
 
 type UserResponse struct {
@@ -38,12 +38,10 @@ type UserResponse struct {
 	Nama           string   `json:"nama"`
 	Jurusan        *string  `no_telpjson:"jurusan"`
 	NoPengenal     string   `json:"no_pengenal"`
-	NoTelp         string   `json:""`
+	NoTelp         string   `json:"no_telp"`
 	Role           string   `json:"role"`
 	ProfilePicture *string  `json:"profile_picture"`
 	Spesialisasi   []string `json:"spesialisasi"`
-	// CreatedAt     time.Time `json:"created_at"`
-	// UpdatedAt     time.Time `json:"updated_at"`
 }
 
 type UserGetMe struct {
@@ -62,12 +60,6 @@ type UpdateUserRequest struct {
 	Nama         string `json:"nama"`
 	Jurusan      string `json:"jurusan"`
 	NoTelp       string `json:"no_telp"`
-	Spesialisasi string `json:"spesialisasi"`
-	// Role          string `json:"role"` // "mahasiswa" atau "dosen"
-}
-
-type BookmarkResponse struct {
-	ID          string            `json:"id"`
-	RekrutmenID string            `json:"rekrutmen_id"`
-	Rekrutmen   RekrutmenResponse `json:"rekrutmen"`
+	Spesialisasi []string `json:"spesialisasi"`
+	NoPengenal   string `json:"no_pengenal"`
 }

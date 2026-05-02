@@ -22,14 +22,19 @@ import (
 
 func main() {
 	// disable in docker image
-	if err := loadEnv(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// if err := loadEnv(); err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
+
+	// port := os.Getenv("PORT")
+	// if port == "" {
+	// 	port = "8080"
+	// }
 
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 	if secretKey == "" {
@@ -51,18 +56,21 @@ func main() {
 	pendaftarRepo := repositories.NewPendaftarRepository(db)
 	timRepo := repositories.NewTimRepository(db)
 	historyRepo := repositories.NewHistoryRepository(db)
+	bookmarkRepo := repositories.NewBookmarkRepository(db)
 	settingDriveRepo := repositories.NewSettingDriveRepository(gdrive, db)
 
 	// services
 	settingDriveService := services.NewSettingDriveService(settingDriveRepo, gdrive)
-	userService := services.NewUserService(userRepo, jwtService, settingDriveService, gdrive)
+	userService := services.NewUserService(rekrutmenRepo, userRepo, jwtService, settingDriveService, gdrive)
+	bookService := services.NewBookmarkService(bookmarkRepo)
 	rekrutmenService := services.NewRekrutmenService(rekrutmenRepo, pendaftarRepo, timRepo, historyRepo, settingDriveService)
 
 	// handlers
+	bookController := handlers.NewBookmarkHandler(bookService)
 	userController := handlers.NewUserHandler(userService)
 	rekrutmenController := handlers.NewRekrutmenHandler(rekrutmenService)
 
-	routes.SetupRoutes(r, userController, rekrutmenController)
+	routes.SetupRoutes(r, userController, rekrutmenController, bookController)
 
 	r.Run(":8080")
 }

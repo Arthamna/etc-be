@@ -30,6 +30,7 @@ type (
 	}
 
 	userService struct {
+		rekrutmenRepo repositories.RekrutmenRepository
 		userRepo     repositories.UserRepository
 		jwtService   JWTService
 		driveService SettingDriveService
@@ -37,8 +38,9 @@ type (
 	}
 )
 
-func NewUserService(userRepo repositories.UserRepository, jwtService JWTService, driveService SettingDriveService, gdrive storage.Gdrive) UserService {
+func NewUserService(rekrutmenRepo repositories.RekrutmenRepository, userRepo repositories.UserRepository, jwtService JWTService, driveService SettingDriveService, gdrive storage.Gdrive) UserService {
 	return &userService{
+		rekrutmenRepo: rekrutmenRepo,
 		userRepo:     userRepo,
 		jwtService:   jwtService,
 		driveService: driveService,
@@ -53,7 +55,8 @@ func (s *userService) Register(ctx context.Context, req dtos.UserRegisterRequest
 	defer mu.Unlock()
 
 	// validate based on role
-	if req.Role == constants.USER_NRP {
+	switch req.Role {
+	case constants.USER_NRP:
 		if *req.Jurusan == "" {
 			return dtos.UserRegisterResponse{}, errors.New("mahasiswa harus mengisi jurusan")
 		}
@@ -61,7 +64,7 @@ func (s *userService) Register(ctx context.Context, req dtos.UserRegisterRequest
 		if existing != nil {
 			return dtos.UserRegisterResponse{}, errors.New("nrp already registered")
 		}
-	} else if req.Role == constants.USER_NIDN {
+	case constants.USER_NIDN:
 		existing, _ := s.userRepo.FindByNoPengenal(ctx, req.NoPengenal)
 		if existing != nil {
 			return dtos.UserRegisterResponse{}, errors.New("nidn already registered")
@@ -85,10 +88,11 @@ func (s *userService) Register(ctx context.Context, req dtos.UserRegisterRequest
 		Spesialisasi: req.Spesialisasi,
 	}
 
-	if req.Role == "mahasiswa" {
+	switch req.Role {
+	case constants.USER_NRP:
 		user.NoPengenal = req.NoPengenal
 		user.Jurusan = req.Jurusan
-	} else if req.Role == "dosen" {
+	case constants.USER_NIDN:
 		user.NoPengenal = req.NoPengenal
 	}
 
@@ -103,13 +107,13 @@ func (s *userService) Register(ctx context.Context, req dtos.UserRegisterRequest
 	}
 
 	return dtos.UserRegisterResponse{
-		User:  dtos.UserResponse{
-			UserID:   createdUser.UserID,
-			Nama:     createdUser.Nama,
-			Role:     createdUser.Role,
-			NoTelp:   createdUser.NoTelp,
-			NoPengenal:      createdUser.NoPengenal,
-			Jurusan:  createdUser.Jurusan,
+		User: dtos.UserResponse{
+			UserID:       createdUser.UserID,
+			Nama:         createdUser.Nama,
+			Role:         createdUser.Role,
+			NoTelp:       createdUser.NoTelp,
+			NoPengenal:   createdUser.NoPengenal,
+			Jurusan:      createdUser.Jurusan,
 			Spesialisasi: createdUser.Spesialisasi,
 		},
 		Token: token,
@@ -152,23 +156,23 @@ func (s *userService) GetByID(ctx context.Context, userId string) (dtos.UserGetM
 		return dtos.UserGetMe{}, errors.New("user not found")
 	}
 
-
 	return dtos.UserGetMe{
 		PersonalInfo: dtos.UserResponse{
 			UserID:         user.UserID,
 			Nama:           user.Nama,
 			Jurusan:        user.Jurusan,
-			NoPengenal: user.NoPengenal,
+			NoPengenal:     user.NoPengenal,
 			NoTelp:         user.NoTelp,
 			Role:           user.Role,
 			ProfilePicture: user.ProfilePicture,
+			Spesialisasi:   user.Spesialisasi,
 		},
 	}, nil
 }
 
 func (s *userService) Login(ctx context.Context, req dtos.UserLoginRequest) (dtos.UserLoginResponse, error) {
 	// var user *models.User
-	var err error
+	// var err error
 
 	user, err := s.userRepo.FindByNoPengenal(ctx, req.NoPengenal)
 	if err != nil {
@@ -202,14 +206,18 @@ func (s *userService) UpdateUser(ctx context.Context, userID string, req dtos.Up
 	if req.Nama != "" {
 		user.Nama = req.Nama
 	}
+	if req.NoPengenal != "" {
+		user.NoPengenal = req.NoPengenal
+	}
 	if req.Jurusan != "" {
 		user.Jurusan = &req.Jurusan
 	}
 	if req.NoTelp != "" {
 		user.NoTelp = req.NoTelp
 	}
-	if req.Spesialisasi != "" {
-		user.Spesialisasi = []string{req.Spesialisasi}
+	
+	if len(req.Spesialisasi) > 0 {
+		user.Spesialisasi = req.Spesialisasi
 	}
 
 	user.UpdatedAt = time.Now()
@@ -223,10 +231,11 @@ func (s *userService) UpdateUser(ctx context.Context, userID string, req dtos.Up
 		UserID:         updated.UserID,
 		Nama:           updated.Nama,
 		Jurusan:        updated.Jurusan,
-		NoPengenal:           updated.NoPengenal,
+		NoPengenal:     updated.NoPengenal,
 		NoTelp:         updated.NoTelp,
 		Role:           updated.Role,
 		ProfilePicture: updated.ProfilePicture,
+		Spesialisasi:   updated.Spesialisasi,
 	}, nil
 }
 
@@ -238,11 +247,32 @@ func (s *userService) GetBookmarks(ctx context.Context, userID string) ([]dtos.B
 
 	var responses []dtos.BookmarkResponse
 	for _, b := range bookmarks {
+		rekrutmen, err := s.rekrutmenRepo.FindByID(ctx, b.RekrutmenID)
+		if err != nil {
+			return nil, err
+		}
+
+		fee := float64(0)
+		if rekrutmen.Fee != nil {
+			fee = *rekrutmen.Fee
+		}
+
 		responses = append(responses, dtos.BookmarkResponse{
 			ID:          b.ID,
 			RekrutmenID: b.RekrutmenID,
-			Rekrutmen:   dtos.ToRekrutmenResponse(&b.Rekrutmen),
+			Rekrutmen: dtos.RekrutmenResponse{
+				RekrutmenID:    rekrutmen.RekrutmenID,
+				UserID:         rekrutmen.UserID,
+				Kegiatan:       rekrutmen.Kegiatan,
+				Kriteria:       rekrutmen.Kriteria,
+				TanggalMulai:   rekrutmen.TanggalMulai,
+				TanggalSelesai: rekrutmen.TanggalSelesai,
+				Fee:            fee,
+				Role:           rekrutmen.Role,
+				ContactPerson:  rekrutmen.ContactPerson,
+			},
 		})
 	}
+
 	return responses, nil
 }
