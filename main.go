@@ -31,11 +31,6 @@ func main() {
 		port = "8080"
 	}
 
-	// port := os.Getenv("PORT")
-	// if port == "" {
-	// 	port = "8080"
-	// }
-
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 	if secretKey == "" {
 		log.Fatal("JWT_SECRET_KEY tidak ditemukan di environment variables")
