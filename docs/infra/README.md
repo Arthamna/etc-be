@@ -12,6 +12,13 @@
 ### Azure
 - Container Registry
 
+
+### Login di Azure CLI 
+```
+az login
+az acr login --name etcimage -g DefaultResourceGroup-EA
+```
+
 ---
 
 ## Build image Docker local 
@@ -46,11 +53,11 @@ az login
 az acr login --name {name_acr} -g {name_resource_group}
 
 # tag each repo and push, example :
-    docker tag etc-be:dev etcimage.azurecr.io/etc-be:prod
-    docker push etcimage.azurecr.io/etc-be:prod
+docker tag etc-be:dev etcimage.azurecr.io/etc-be:prod
+docker push etcimage.azurecr.io/etc-be:prod
 
-    docker tag etc-fe:dev etcimage.azurecr.io/etc-fe:prod
-    docker push etcimage.azurecr.io/etc-fe:prod
+docker tag etc-fe:dev etcimage.azurecr.io/etc-fe:prod
+docker push etcimage.azurecr.io/etc-fe:prod
 ```
 
 ---
