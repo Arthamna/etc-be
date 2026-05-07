@@ -5,13 +5,13 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/rekrutmen/ff62ebbc-826e-45aa-b06f-1fda65f4a661/apply/portfolio
+  url: "{{BASE_URL}}/api/rekrutmen/ff62ebbc-826e-45aa-b06f-1fda65f4a661/apply/portfolio"
   body:
     type: multipart-form
     data:
       - name: portfolio
         type: file
-        value: &a1
+        value:
           - C:\Users\LEGION SLIM 5\Downloads\Notulensi Pembahasan Arah BCC_ Fokus UMKM.pdf
   auth:
     type: bearer
@@ -22,39 +22,3 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
-
-examples:
-  - name: Success
-    request:
-      url: http://localhost:8080/api/rekrutmen/ff62ebbc-826e-45aa-b06f-1fda65f4a661/apply/portfolio
-      method: POST
-      body:
-        type: multipart-form
-        data:
-          - name: portfolio
-            type: file
-            value: *a1
-    response:
-      status: 200
-      statusText: OK
-      headers:
-        - name: access-control-allow-credentials
-          value: "true"
-        - name: access-control-allow-headers
-          value: Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With
-        - name: access-control-allow-methods
-          value: POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE
-        - name: access-control-allow-origin
-          value: "*"
-        - name: content-type
-          value: application/json; charset=utf-8
-        - name: date
-          value: Fri, 01 May 2026 12:17:27 GMT
-        - name: content-length
-          value: "80"
-      body:
-        type: json
-        data: |-
-          {
-            "url": "https://drive.google.com/file/d/1rfHpo9wmVDLWoM1jD-QMjHTwXj4PObeM/view"
-          }

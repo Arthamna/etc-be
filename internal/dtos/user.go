@@ -15,7 +15,7 @@ type UserRegisterRequest struct {
 	Password     string   `json:"password" binding:"required,min=6"`
 	NoTelp       string   `json:"no_telp" binding:"required"`
 	NoPengenal   string   `json:"no_pengenal" binding:"required"`
-	Spesialisasi []string `json:"spesialisasi" binding:"required"`
+	Spesialisasi []string `json:"spesialisasi"`
 }
 
 type UserLoginRequest struct {

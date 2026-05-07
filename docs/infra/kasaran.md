@@ -44,7 +44,10 @@ Build local fe :
 
 
 ```
-docker build -t etc-fe:dev --build-arg NEXT_PUBLIC_API_URL=http://localhost:8080 .
+docker build -t etc-fe:dev --build-arg NEXT_PUBLIC_API_URL=http://localhost .
+docker run --rm -p 3000:3000 etc-fe:dev
+
+docker build -t etc-fe:dev --build-arg NEXT_PUBLIC_API_URL=https://etc-backend-prod.gentlepebble-313cd90b.eastasia.azurecontainerapps.io .
 docker run --rm -p 3000:3000 etc-fe:dev
 ```
 
@@ -65,13 +68,13 @@ az acr login --name etcimage -g DefaultResourceGroup-EA
 
 ```
 
-docker tag etc-be:dev etcimage.azurecr.io/etc-be:prod2
+docker tag etc-be:dev etcimage.azurecr.io/etc-be:prod3
 
-docker push etcimage.azurecr.io/etc-be:prod2
+docker push etcimage.azurecr.io/etc-be:prod3
 
-docker tag etc-fe:dev etcimage.azurecr.io/etc-fe
+docker tag etc-fe:dev etcimage.azurecr.io/etc-fe:prod4
 
-docker push etcimage.azurecr.io/etc-fe
+docker push etcimage.azurecr.io/etc-fe:prod4
 ```
 
 Managed Identities 
@@ -114,6 +117,9 @@ setelah mendapatkan application url be, maka commandnya bisa disesuaikan :
 
 ```
 docker build -t etc-fe:dev --build-arg NEXT_PUBLIC_API_URL={YOUR_APPLICATION_URL_BE} .
+
+
+docker build -t etc-fe:dev --build-arg NEXT_PUBLIC_API_URL=.
 docker run --rm -p 3000:3000 etc-fe:dev
 ```
 

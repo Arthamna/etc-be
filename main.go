@@ -22,9 +22,9 @@ import (
 
 func main() {
 	// disable in docker image
-	// if err := loadEnv(); err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
+	if err := loadEnv(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -58,7 +58,7 @@ func main() {
 	settingDriveService := services.NewSettingDriveService(settingDriveRepo, gdrive)
 	userService := services.NewUserService(rekrutmenRepo, userRepo, jwtService, settingDriveService, gdrive)
 	bookService := services.NewBookmarkService(bookmarkRepo)
-	rekrutmenService := services.NewRekrutmenService(rekrutmenRepo, pendaftarRepo, timRepo, historyRepo, settingDriveService)
+	rekrutmenService := services.NewRekrutmenService(userRepo, rekrutmenRepo, pendaftarRepo, timRepo, historyRepo, settingDriveService)
 
 	// handlers
 	bookController := handlers.NewBookmarkHandler(bookService)

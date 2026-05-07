@@ -5,10 +5,7 @@ info:
 
 http:
   method: PUT
-  url: "{{BASE_URL}}/api/rekrutmen/15344251-ba55-447c-9c81-953a34835fcc"
-  headers:
-    - name: Authorization
-      value: "{{token.mahasiswa1}}"
+  url: "{{BASE_URL}}/api/rekrutmen/b949be2a-55c0-476e-b34e-f2d4e18e0ae2"
   body:
     type: json
     data: |-
@@ -21,10 +18,62 @@ http:
         "role": "Frontend Developer",
         "contact_person": "0895609474814"
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzgwMTk2MywiaWF0IjoxNzc3Nzk0NzYzfQ.4AjDZ26QNoNmknNnT4lWkw3hcFIkyj59nPmU6dXOo6A
 
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: "{{BASE_URL}}/api/rekrutmen/b949be2a-55c0-476e-b34e-f2d4e18e0ae2"
+      method: PUT
+      body:
+        type: json
+        data: |-
+          {
+            "kegiatan": "lomba",
+            "Kriteria": "Mahasiswa aktif S1, IPK minimal 3.0",
+            "tanggal_mulai": "2026-05-01T00:00:00Z",
+            "tanggal_selesai": "2026-06-01T00:00:00Z",
+            "fee": 25000,
+            "role": "Frontend Developer",
+            "contact_person": "0895609474814"
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With
+        - name: access-control-allow-methods
+          value: POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE
+        - name: access-control-allow-origin
+          value: "*"
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Sun, 03 May 2026 07:28:05 GMT
+        - name: content-length
+          value: "325"
+      body:
+        type: json
+        data: |-
+          {
+            "rekrutmen_id": "b949be2a-55c0-476e-b34e-f2d4e18e0ae2",
+            "user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
+            "kegiatan": "lomba",
+            "Kriteria": "Mahasiswa aktif S1, IPK minimal 3.0",
+            "tanggal_mulai": "2026-05-01T00:00:00Z",
+            "tanggal_selesai": "2026-06-01T00:00:00Z",
+            "fee": 25000,
+            "role": "Frontend Developer",
+            "contact_person": "0895609474814"
+          }

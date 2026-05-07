@@ -8,7 +8,7 @@ http:
   url: "{{BASE_URL}}/api/rekrutmen/applicants/5db1e7b7-16c2-4876-bea6-f180c60f274c"
   auth:
     type: bearer
-    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3NzY0NjMxOCwiaWF0IjoxNzc3NjM5MTE4fQ.ntU9i81SnoX66eLa0QqzDzkGIjHofboKjNdkr69jEls
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDNhMmI3ZDMtYzE4ZC00MDZmLWFjNzMtYjcwZjZlYTVlNTYwIiwicm9sZSI6Im1haGFzaXN3YSIsImlzcyI6InJwTGlicmFyeSIsImV4cCI6MTc3Nzc3NTY3NCwiaWF0IjoxNzc3NzY4NDc0fQ.lkJRqrXsAoVJmYfHP9XAt1qBNyqroAUJPEI8nhotaYw
 
 settings:
   encodeUrl: true
@@ -81,4 +81,98 @@ examples:
             "role": "software engineer",
             "contact_person": "08123456789",
             "pendaftar": null
+          }
+  - name: Success Revisi
+    request:
+      url: "{{BASE_URL}}/api/rekrutmen/applicants/5db1e7b7-16c2-4876-bea6-f180c60f274c"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With
+        - name: access-control-allow-methods
+          value: POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE
+        - name: access-control-allow-origin
+          value: "*"
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Sun, 03 May 2026 00:34:48 GMT
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: json
+        data: |-
+          {
+            "rekrutmen_id": "5db1e7b7-16c2-4876-bea6-f180c60f274c",
+            "user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
+            "kegiatan": "projek",
+            "Kriteria": "Menguasai REST API",
+            "tanggal_mulai": "2026-05-01T00:00:00Z",
+            "tanggal_selesai": "2026-05-31T00:00:00Z",
+            "fee": 1500000,
+            "role": "software engineer",
+            "contact_person": "08123456789",
+            "tim_id": "a37c5354-a144-4351-92f5-cb2598ea843b",
+            "pendaftar": [
+              {
+                "pendaftar_id": "e6466453-df17-45c8-9180-a3d3b1d881e2",
+                "rekrutmen_id": "5db1e7b7-16c2-4876-bea6-f180c60f274c",
+                "user_id": "a4aca3b3-1139-4426-9e95-5d50f6f0113d",
+                "alasan_mendaftar": "saya mau belajar",
+                "cv_url": "https://drive.google.com/file/d/1cKzKN62u8KBwoy6hyoMEDC0HykR0fqWg/view?usp=sharing",
+                "portofolio_url": "https://drive.google.com/file/d/1cKzKN62u8KBwoy6hyoMEDC0HykR0fqWg/view?usp=sharing",
+                "status": "rejected",
+                "nama_pendaftar": "Taiki Inomata",
+                "histories": []
+              },
+              {
+                "pendaftar_id": "5b159cc9-892c-4552-a17f-ab3c923a0ffc",
+                "rekrutmen_id": "5db1e7b7-16c2-4876-bea6-f180c60f274c",
+                "user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
+                "alasan_mendaftar": "saya sudah mempunyai pengalaman yang cukup banyak menggukana wordpress, dan saya sangat tertarik dalam menggunakan wordpress.",
+                "cv_url": "https://drive.google.com/file/d/159nA-72S7ppRUXOHU0GGBiX6gyL6CRz-/view",
+                "portofolio_url": "https://drive.google.com/file/d/1rfHpo9wmVDLWoM1jD-QMjHTwXj4PObeM/view",
+                "status": "rejected",
+                "nama_pendaftar": "Budi Santoso Test",
+                "histories": []
+              },
+              {
+                "pendaftar_id": "934da4cc-897f-4fc9-9dc2-06decb5d834c",
+                "rekrutmen_id": "5db1e7b7-16c2-4876-bea6-f180c60f274c",
+                "user_id": "38bc4242-838f-4319-a5ae-b0d02b8585c4",
+                "alasan_mendaftar": "saya sudah mempunyai pengalaman yang cukup banyak menggukana wordpress, dan saya sangat tertarik dalam menggunakan wordpress.",
+                "cv_url": "https://drive.google.com/file/d/159nA-72S7ppRUXOHU0GGBiX6gyL6CRz-/view",
+                "portofolio_url": "https://drive.google.com/file/d/1rfHpo9wmVDLWoM1jD-QMjHTwXj4PObeM/view",
+                "status": "rejected",
+                "nama_pendaftar": "Budi Santoso Pendaftar",
+                "histories": [
+                  {
+                    "id": "672d7d4b-8747-4041-a1c5-c41038b2c91c",
+                    "reviewer_user_id": "d3a2b7d3-c18d-406f-ac73-b70f6ea5e560",
+                    "reviewer_name": "Budi Santoso Test",
+                    "tim_id": "a37c5354-a144-4351-92f5-cb2598ea843b",
+                    "tipe_tim": "projek",
+                    "rating": 4,
+                    "deskripsi": "cukup inisiatif, tapi secara umum masih kurang aktif",
+                    "created_at": "2026-05-01T13:56:11.712174Z"
+                  }
+                ]
+              },
+              {
+                "pendaftar_id": "2cbf542c-bcdc-4e5e-a53e-9fa29730f007",
+                "rekrutmen_id": "5db1e7b7-16c2-4876-bea6-f180c60f274c",
+                "user_id": "c5236884-af79-4698-86e7-2decabb50908",
+                "alasan_mendaftar": "saya kairi saya jungler",
+                "cv_url": "https://drive.google.com/drive/u/0/my-drive",
+                "portofolio_url": "https://drive.google.com/drive/u/0/my-drive",
+                "status": "approved",
+                "nama_pendaftar": "Kairi",
+                "histories": []
+              }
+            ]
           }

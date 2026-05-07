@@ -36,6 +36,7 @@ type RekrutmenService interface {
 }
 
 type rekrutmenService struct {
+    userRepo      repositories.UserRepository
     rekrutmenRepo repositories.RekrutmenRepository
     pendaftarRepo repositories.PendaftarRepository
     timRepo       repositories.TimRepository
@@ -44,6 +45,7 @@ type rekrutmenService struct {
 }
 
 func NewRekrutmenService(
+    userRepo repositories.UserRepository,
     rekrutmenRepo repositories.RekrutmenRepository,
     pendaftarRepo repositories.PendaftarRepository,
     timRepo repositories.TimRepository,
@@ -51,6 +53,7 @@ func NewRekrutmenService(
     driveService SettingDriveService,
 ) RekrutmenService {
     return &rekrutmenService{
+        userRepo:      userRepo,
         rekrutmenRepo: rekrutmenRepo,
         pendaftarRepo: pendaftarRepo,
         timRepo:       timRepo,
@@ -196,7 +199,33 @@ func (s *rekrutmenService) GetAppliedByID(ctx context.Context, id string, userID
         ContactPerson:  rekrutmen.ContactPerson,
         TimID:          timID,
     }
+
     for _, p := range *pendaftar {
+        user, err := s.userRepo.FindByID(ctx, p.UserID)
+        if err != nil {
+            return nil, err
+        }
+
+        histories, err := s.historyRepo.FindByUserID(ctx, p.UserID)
+        if err != nil {
+            return nil, err
+        }
+        
+        History := make([]dtos.HistoryResponse, len(histories))
+
+        for i, h := range histories {
+            History[i] = dtos.HistoryResponse{
+                ID:            h.ID,
+                ReviewerUserID: h.ReviewerUserID,
+                ReviewerName:   h.Reviewer.Nama,
+                TimID:          h.TimID,
+                TipeTim:        h.Tim.TipeTim,
+                Rating:         h.Rating,
+                Deskripsi:      h.Deskripsi,
+                CreatedAt:      h.CreatedAt,
+            }
+        }
+
         res.Pendaftar = append(res.Pendaftar, dtos.PendaftarResponse{
             PendaftarID:     p.PendaftarID,
             RekrutmenID:     p.RekrutmenID,
@@ -205,7 +234,8 @@ func (s *rekrutmenService) GetAppliedByID(ctx context.Context, id string, userID
             CVURL:           p.CVURL,
             PortofolioURL:   p.PortofolioURL,
             Status:          p.Status,
-            NamaPendaftar:   p.User.Nama,
+            NamaPendaftar:   user.Nama,
+            Histories:       History,
         })
     }
     return &res, nil
@@ -252,6 +282,11 @@ func (s *rekrutmenService) Update(ctx context.Context, userID, rekrutmenID strin
     if req.Kegiatan != "" {
         rekrutmen.Kegiatan = req.Kegiatan
     }
+
+    if req.Kriteria != "" {
+        rekrutmen.Kriteria = req.Kriteria
+    }
+
     if !req.TanggalMulai.IsZero() {
         rekrutmen.TanggalMulai = req.TanggalMulai
     }
@@ -273,21 +308,33 @@ func (s *rekrutmenService) Update(ctx context.Context, userID, rekrutmenID strin
 		return nil, err
 	}
 
-	updated, err = s.rekrutmenRepo.FindByID(ctx, updated.RekrutmenID)
-	if err != nil {
-		return nil, err
-	}
+	// updated, err = s.rekrutmenRepo.FindByID(ctx, updated.RekrutmenID)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// res := dtos.RekrutmenResponse{
+    //     RekrutmenID:    rekrutmen.RekrutmenID,
+    //     UserID:         rekrutmen.UserID,
+    //     Kegiatan:       rekrutmen.Kegiatan,
+    //     Kriteria:       rekrutmen.Kriteria,
+    //     TanggalMulai:   rekrutmen.TanggalMulai,
+    //     TanggalSelesai: rekrutmen.TanggalSelesai,
+    //     Fee:            *rekrutmen.Fee,
+    //     Role:           rekrutmen.Role,
+    //     ContactPerson:  rekrutmen.ContactPerson,
+    // }
 
 	res := dtos.RekrutmenResponse{
-        RekrutmenID:    rekrutmen.RekrutmenID,
-        UserID:         rekrutmen.UserID,
-        Kegiatan:       rekrutmen.Kegiatan,
-        Kriteria:       rekrutmen.Kriteria,
-        TanggalMulai:   rekrutmen.TanggalMulai,
-        TanggalSelesai: rekrutmen.TanggalSelesai,
-        Fee:            *rekrutmen.Fee,
-        Role:           rekrutmen.Role,
-        ContactPerson:  rekrutmen.ContactPerson,
+        RekrutmenID:    updated.RekrutmenID,
+        UserID:         updated.UserID,
+        Kegiatan:       updated.Kegiatan,
+        Kriteria:       updated.Kriteria,
+        TanggalMulai:   updated.TanggalMulai,
+        TanggalSelesai: updated.TanggalSelesai,
+        Fee:            *updated.Fee,
+        Role:           updated.Role,
+        ContactPerson:  updated.ContactPerson,
     }
 	return &res, nil
 }
